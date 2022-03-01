@@ -8582,6 +8582,11 @@ three-orbit-controls@^82.1.0:
   resolved "https://registry.yarnpkg.com/three-orbit-controls/-/three-orbit-controls-82.1.0.tgz#11a7f33d0a20ecec98f098b37780f6537374fab4"
   integrity sha1-EafzPQog7OyY8Jizd4D2U3N0+rQ=
 
+three.interaction@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/three.interaction/-/three.interaction-0.2.3.tgz#f7947b4e44649a822335b03b1dcc68c659d71c04"
+  integrity sha512-gipj4E9WSASSys3SC5uU8HPmHodTDYmggJqKN5yjl6S2vG966EkGLu67jkXQoyB/yvGx38C72vHwdjICAh+avg==
+
 three@^0.137.5:
   version "0.137.5"
   resolved "https://registry.yarnpkg.com/three/-/three-0.137.5.tgz#a1e34bedd0412f2d8797112973dfadac78022ce6"

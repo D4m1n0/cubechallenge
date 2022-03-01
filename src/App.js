@@ -75,7 +75,7 @@ function App() {
     return (
         <div className="App">
             {
-                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} getCubesFromMovement={getCubesFromMovement} scramble={"F U2 F B L2"} /> ) : ""
+                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} getCubesFromMovement={getCubesFromMovement} scramble={"B"} /> ) : ""
             }
         </div>
     );

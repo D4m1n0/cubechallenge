@@ -1,12 +1,12 @@
 import * as THREE from "three";
 
 const colors = [
-    "#DC422F",
-    "#FF6C00",
-    "#FFFFFF",
-    "#FDCC09",
-    "#009D54",
-    "#3D81F6"
+    "#DC422F", // x = 1
+    "#FF6C00", // x = -1
+    "#FFFFFF", // y = 1
+    "#FDCC09", // y = -1
+    "#009D54", // z = 1
+    "#3D81F6"  // z = -1
 ]
 const MOVEMENTS = {
     "R": ["x", -(Math.PI/2)],
@@ -52,16 +52,33 @@ class Cube {
         return texture;
     }
     face () {
-        let materials = []
-        for (let i = 0; i < 6; i++) {
-            let texture = this.colorFace(colors[i])
-            let m = new THREE.MeshBasicMaterial({map: texture})
-            // if(this.n !== 0) {
-            //     m.transparent = true;
-            //     m.opacity = 0.5
-            // }
-            materials.push(m)
+        let materials = Array.from({length:6}, () => { return 1 })
+        let black = this.colorFace("#000000");
+        let temp = []
+        temp.push(this.x === 1 ? this.colorFace(colors[0]) : black)
+        temp.push(this.x === -1 ? this.colorFace(colors[1]) : black)
+        temp.push(this.y === 1 ? this.colorFace(colors[2]) : black)
+        temp.push(this.y === -1 ? this.colorFace(colors[3]) : black)
+        temp.push(this.z === 1 ? this.colorFace(colors[4]) : black)
+        temp.push(this.z === -1 ? this.colorFace(colors[5]) : black)
+        for (let i = 0; i < temp.length; i++) {
+            let m = new THREE.MeshBasicMaterial({map: temp[i]})
+            if(this.n === -1) {
+                m.transparent = true;
+                m.opacity = 0.5
+            }
+            materials[i] = m
         }
+        // x = -1 alors colors[0][1] / x = 1 alors colors[0][0]
+        // for (let i = 1; i < colors.length; i++) {
+        //     let texture = this.colorFace(colors[i])
+        //     let m = new THREE.MeshBasicMaterial({map: texture})
+        //     if(this.n === -1) {
+        //         m.transparent = true;
+        //         m.opacity = 0.5
+        //     }
+        //     materials[i] = m
+        // }
         return materials
     }
     // determinateAxisViaMovement(movement) {
@@ -140,6 +157,15 @@ class Cube {
         this.rotateOnAxis(axis, angle, movement);
         this.translateCube(angle, axis)
     }
+    determinateCornerOrEdge() {
+        let type = Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z)
+        if(type === 3) {
+            return "corner"
+        } else if(type === 2) {
+            return "edge"
+        }
+        return "center"
+    }
     show() {
         const geometry = new THREE.BoxGeometry(1, 1, 1)
         this.cube = new THREE.Mesh(geometry, this.face())
@@ -151,6 +177,8 @@ class Cube {
         this.cube.rotation.x = this.rotation[0]
         this.cube.rotation.y = this.rotation[1]
         this.cube.rotation.z = this.rotation[2]
+
+        console.log(this.n, this.determinateCornerOrEdge(), {x: this.x, y: this.y, z: this.z})
 
         return this.cube
     }
