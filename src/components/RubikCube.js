@@ -7,6 +7,26 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
     const mount = useRef(null)
     const controls = useRef(null)
 
+    const movementWithScramble = (movements, index) => {
+        let double = movements[index].indexOf("2") > -1 ? 1 : 0
+        let movement = double ? movements[index].replace("2", "") : movements[index]
+        movements[index] = movement
+        if(double) {
+            movements.splice(index, 0, movement)
+        }
+
+        let cubeMovement = getCubesFromMovement(movement)
+        for (let i = 0; i < cubeMovement.length; i++) {
+            cubeMovement[i].update(movement)
+        }
+        setTimeout(() => {
+            if(index < movements.length-1) {
+                index += 1
+                movementWithScramble(movements, index)
+            }
+        }, 500)
+    }
+
     useEffect(() => {
         let width = mount.current.clientWidth
         let height = mount.current.clientHeight
@@ -26,18 +46,21 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         scene.add(group)
         group.rotation.x = 0.5
         group.rotation.y = 0.5
+        group.rotation.z = Math.PI
 
         let movements = scramble.split(" ");
 
+        movementWithScramble(movements, 0)
+
         let i = 0
         // TODO enhance for 2 moves (U2)
-        setInterval(function() {
-            let cubeMovement = getCubesFromMovement(movements[i])
-            for (let j = 0; j < cubeMovement.length; j++) {
-                cubeMovement[j].update(movements[i])
-            }
-            i++;
-        }, 1000)
+        // setInterval(function() {
+        //     let cubeMovement = getCubesFromMovement(movements[i])
+        //     for (let j = 0; j < cubeMovement.length; j++) {
+        //         cubeMovement[j].update(movements[i])
+        //     }
+        //     i++;
+        // }, 1000)
 
         // TODO Click for move
 
