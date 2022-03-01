@@ -3,7 +3,7 @@ import { useRef, useEffect} from "react";
 
 const OrbitControls = require('three-orbit-controls')(THREE);
 
-const RubikCube = ({cubeArray, getCubesFromMovement}) => {
+const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
     const mount = useRef(null)
     const controls = useRef(null)
 
@@ -26,12 +26,31 @@ const RubikCube = ({cubeArray, getCubesFromMovement}) => {
         scene.add(group)
         group.rotation.x = 0.5
         group.rotation.y = 0.5
-        let movement = "E"
-        let cubeMovement = getCubesFromMovement(movement)
 
-        for (let i = 0; i < cubeMovement.length; i++) {
-            cubeMovement[i].update(movement)
-        }
+        let movements = scramble.split(" ");
+
+        let i = 0
+        setInterval(function() {
+            let cubeMovement = getCubesFromMovement(movements[i])
+            for (let j = 0; j < cubeMovement.length; j++) {
+                cubeMovement[j].update(movements[i])
+            }
+            i++;
+        }, 1000)
+
+        // for (let i = 0; i < movements.length; i++) {
+        //     let cubeMovement = getCubesFromMovement(movements[i])
+        //     for (let j = 0; j < cubeMovement.length; j++) {
+        //         cubeMovement[j].update(movements[i])
+        //     }
+        // }
+
+        // let movement = "E"
+        // let cubeMovement = getCubesFromMovement(movement)
+        //
+        // for (let i = 0; i < cubeMovement.length; i++) {
+        //     cubeMovement[i].update(movement)
+        // }
 
         renderer.setClearColor('#000000')
         renderer.setSize(width, height)

@@ -56,7 +56,7 @@ class Cube {
         for (let i = 0; i < 6; i++) {
             let texture = this.colorFace(colors[i])
             let m = new THREE.MeshBasicMaterial({map: texture})
-            // if(this.n !== 26) {
+            // if(this.n !== 0) {
             //     m.transparent = true;
             //     m.opacity = 0.5
             // }
@@ -93,8 +93,11 @@ class Cube {
     //     this.angle = angle
     //     return angle
     // }
-    rotateOnAxis(axisString, angle) {
+    rotateOnAxis(axisString, angle, movement) {
         let axis = this.determinateAxisViaMovement(axisString)
+        if(movement === "U" || movement === "D") {
+            angle = -angle
+        }
 
         // this.cube.rotateOnAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
         this.cube.rotateOnWorldAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
@@ -134,7 +137,7 @@ class Cube {
         let angle = reverse ? -MOVEMENTS[movement][1] : MOVEMENTS[movement][1]
         this.angle = angle
 
-        this.rotateOnAxis(axis, angle);
+        this.rotateOnAxis(axis, angle, movement);
         this.translateCube(angle, axis)
     }
     show() {
