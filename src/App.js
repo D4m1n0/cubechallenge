@@ -46,14 +46,20 @@ function App() {
             case "F'": face = 1; axe = "z"; break;
             case "B": face = -1; axe = "z"; break;
             case "B'": face = -1; axe = "z"; break;
+            case "S": face = 0; axe = "z"; break;
+            case "S'": face = 0; axe = "z"; break;
             case "U": face = 1; axe = "y"; break;
             case "U'": face = 1; axe = "y"; break;
             case "D": face = -1; axe = "y"; break;
             case "D'": face = -1; axe = "y"; break;
+            case "E": face = 0; axe = "y"; break;
+            case "E'": face = 0; axe = "y"; break;
             case "L": face = -1; axe = "x"; break;
             case "L'": face = -1; axe = "x"; break;
             case "R": face = 1; axe = "x"; break;
             case "R'": face = 1; axe = "x"; break;
+            case "M": face = 0; axe = "x"; break;
+            case "M'": face = 0; axe = "x"; break;
             default: face = 0; break;
         }
 

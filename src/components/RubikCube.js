@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { useRef, useEffect} from "react";
 
+const OrbitControls = require('three-orbit-controls')(THREE);
+
 const RubikCube = ({cubeArray, getCubesFromMovement}) => {
     const mount = useRef(null)
     const controls = useRef(null)
@@ -15,6 +17,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement}) => {
         const renderer = new THREE.WebGLRenderer({ antialias: true })
 
         camera.position.z = 10
+        const controls = new OrbitControls(camera);
         let group = new THREE.Object3D()
 
         for (let i = 0; i < cubeArray.length; i++) {
@@ -23,7 +26,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement}) => {
         scene.add(group)
         group.rotation.x = 0.5
         group.rotation.y = 0.5
-        let movement = "F"
+        let movement = "E"
         let cubeMovement = getCubesFromMovement(movement)
 
         for (let i = 0; i < cubeMovement.length; i++) {

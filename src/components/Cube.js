@@ -8,15 +8,16 @@ const colors = [
     "#009D54",
     "#3D81F6"
 ]
-const movements = [ ["F", "F'", "B", "B'"], ["L", "R", "R'", "L'"], ["U", "D", "U'", "D'"] ]
-const angles = ["F", "B'", "U", "D'", "R", "L'"]
 const MOVEMENTS = {
     "R": ["x", -(Math.PI/2)],
     "L": ["x", Math.PI/2],
+    "M": ["x", Math.PI/2],
     "U": ["y", Math.PI/2],
     "D": ["y", -(Math.PI/2)],
+    "E": ["y", Math.PI/2],
     "F": ["z", -(Math.PI/2)],
-    "B": ["z", Math.PI/2]
+    "B": ["z", Math.PI/2],
+    "S": ["z", -(Math.PI/2)]
 }
 
 class Cube {
