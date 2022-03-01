@@ -30,6 +30,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         let movements = scramble.split(" ");
 
         let i = 0
+        // TODO enhance for 2 moves (U2)
         setInterval(function() {
             let cubeMovement = getCubesFromMovement(movements[i])
             for (let j = 0; j < cubeMovement.length; j++) {
@@ -38,19 +39,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
             i++;
         }, 1000)
 
-        // for (let i = 0; i < movements.length; i++) {
-        //     let cubeMovement = getCubesFromMovement(movements[i])
-        //     for (let j = 0; j < cubeMovement.length; j++) {
-        //         cubeMovement[j].update(movements[i])
-        //     }
-        // }
-
-        // let movement = "E"
-        // let cubeMovement = getCubesFromMovement(movement)
-        //
-        // for (let i = 0; i < cubeMovement.length; i++) {
-        //     cubeMovement[i].update(movement)
-        // }
+        // TODO Click for move
 
         renderer.setClearColor('#000000')
         renderer.setSize(width, height)
