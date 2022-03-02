@@ -61,10 +61,10 @@ class Cube {
         temp.push(this.position.z === -1 ? this.colorFace(colors[5]) : black)
         for (let i = 0; i < temp.length; i++) {
             let m = new THREE.MeshBasicMaterial({map: temp[i]})
-            if(this.determinateCornerOrEdge() === 6 || this.determinateCornerOrEdge() === 0) {
-                m.transparent = true;
-                m.opacity = 0.5
-            }
+            // if(this.determinateCornerOrEdge() === 6 || this.determinateCornerOrEdge() === 0) {
+            //     m.transparent = true;
+            //     m.opacity = 0.5
+            // }
             materials[i] = m
         }
         return materials
@@ -146,6 +146,7 @@ class Cube {
     show() {
         const geometry = new THREE.BoxGeometry(1, 1, 1)
         this.cube = new THREE.Mesh(geometry, this.face())
+        this.cube.name = this.n
 
         this.cube.position.x = this.position.x
         this.cube.position.y = this.position.y
@@ -155,17 +156,7 @@ class Cube {
         this.cube.rotation.y = this.rotation[1]
         this.cube.rotation.z = this.rotation[2]
 
-        let nFaces = this.determinateCornerOrEdge()
-
-        let plane = nFaces > 0 ? Array.from({length: nFaces }, () => {
-            return [this.position.x, this.position.y, this.position.z]
-        }) : ""
-
-        // let x = this.position.x + (this.position.x/2)
-        // let y = this.position.y + (this.position.y/2)
-        // let z = this.position.z + (this.position.z/2)
-
-        console.log(this.determinateFaceFromPosition())
+        // console.log(this.determinateFaceFromPosition())
 
         return this.cube
     }

@@ -1,8 +1,7 @@
 import * as THREE from "three";
 import { useRef, useEffect} from "react";
 import {Interaction} from "../../node_modules/three.interaction/src/index";
-import clickBox from "./ClickBox";
-import ClickBox from "./ClickBox";
+import {TrackballControls} from "three/examples/jsm/controls/experimental/CameraControls";
 
 const OrbitControls = require('three-orbit-controls')(THREE);
 
@@ -38,50 +37,46 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         const scene = new THREE.Scene()
         const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
         const renderer = new THREE.WebGLRenderer({ antialias: true })
+        const axesHelper = new THREE.AxesHelper( 5 );
+        scene.add( axesHelper );
         const interaction = new Interaction(renderer, scene, camera);
 
         camera.position.z = 10
-        const controls = new OrbitControls(camera);
+        const controls = new TrackballControls(camera, renderer.domElement)
+        controls.enablePan = false
         let group = new THREE.Object3D()
 
         for (let i = 0; i < cubeArray.length; i++) {
             group.add(cubeArray[i].show())
         }
         scene.add(group)
-        group.rotation.x = 0.5
-        group.rotation.y = 0.5
+        group.name = "rubik"
+        // group.rotation.x = 0.5
+        // group.rotation.y = 0.5
         // group.rotation.z = Math.PI
-
-        // -1 1 1
-
-        let clickBox3 = new ClickBox(-1.5,  2,    1, 1, "y")    // F
-        let clickBox = new ClickBox( -2,    1.5,  1, 0, "x")      // F'
-        let clickBox4 = new ClickBox(-1,    1.5,  2, 1, "x") // L
-        let clickBox2 = new ClickBox(-1,    2,    1.5, 1, "")    // L'
-        let clickBox5 = new ClickBox(-2,    1,    1.5, 1, "")     // U
-        let clickBox6 = new ClickBox(-1.5,  1,    2, 1, "y")   // U'
-        // group.add(clickBox.show())
-        // group.add(clickBox2.show())
-        // group.add(clickBox3.show())
-        // group.add(clickBox4.show())
-        // group.add(clickBox5.show())
-        // group.add(clickBox6.show())
-
-        for (let z = 1; z >= -1; z-- ) {
-            for (let y = 1; y >= -1; y--) {
-                for (let x = -1; x <= 1; x++ ) {
-                    if(Math.abs(x) + Math.abs(y) + Math.abs(z) === 3) {
-                        console.log(x/2, y/2, z/2)
-                    }
-                }
-            }
-        }
 
         let movements = scramble.split(" ");
 
         movementWithScramble(movements, 0)
         // cubeArray[0].cube.position.x = -2
         // TODO Click for move
+
+        // group.on("pointerdown", function(e) {
+        //     controls.enabled = false
+        //     console.log("start", e.data.tangentialPressure )
+        // })
+        // group.on("pointerup", function(e) {
+        //     controls.enabled = true
+        //     console.log("end", e.data.global)
+        // })
+        // group.on("mouseover", function(e) {
+        //     controls.enabled = true
+        //     console.log("in", e.data.global.x, e.data.global.y)
+        // })
+        // group.on("pointerout", function(e) {
+        //     controls.enabled = true
+        //     // console.log("out", e.data.global)
+        // })
 
         renderer.setClearColor('#9f9f9f')
         renderer.setSize(width, height)
@@ -103,6 +98,8 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
             // group.rotation.x += 0.01
             // group.rotation.y += 0.01
 
+            controls.update()
+
             renderScene()
             frameId = window.requestAnimationFrame(animate)
         }
@@ -122,12 +119,12 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         window.addEventListener('resize', handleResize)
         start()
 
-        controls.current = { start, stop }
+        // controls.current = { start, stop }
 
         return () => {
             stop()
             window.removeEventListener('resize', handleResize)
-            mount.current.removeChild(renderer.domElement)
+            // mount.current.removeChild(renderer.domElement)
 
             // scene.remove(cube)
             // geometry.dispose()

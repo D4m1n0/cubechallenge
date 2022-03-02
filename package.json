@@ -14,6 +14,7 @@
     "three": "^0.137.5",
     "three-orbit-controls": "^82.1.0",
     "three.interaction": "^0.2.3",
+    "three.interactive": "^1.2.1",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
