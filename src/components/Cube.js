@@ -22,9 +22,7 @@ const MOVEMENTS = {
 
 class Cube {
     constructor(x, y, z, rotation, n) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.position = {x: x, y: y, z: z}
         this.n = n;
         this.rotation = rotation;
         this.angle = 0
@@ -55,44 +53,22 @@ class Cube {
         let materials = Array.from({length:6}, () => { return 1 })
         let black = this.colorFace("#000000");
         let temp = []
-        temp.push(this.x === 1 ? this.colorFace(colors[0]) : black)
-        temp.push(this.x === -1 ? this.colorFace(colors[1]) : black)
-        temp.push(this.y === 1 ? this.colorFace(colors[2]) : black)
-        temp.push(this.y === -1 ? this.colorFace(colors[3]) : black)
-        temp.push(this.z === 1 ? this.colorFace(colors[4]) : black)
-        temp.push(this.z === -1 ? this.colorFace(colors[5]) : black)
+        temp.push(this.position.x === 1 ? this.colorFace(colors[0]) : black)
+        temp.push(this.position.x === -1 ? this.colorFace(colors[1]) : black)
+        temp.push(this.position.y === 1 ? this.colorFace(colors[2]) : black)
+        temp.push(this.position.y === -1 ? this.colorFace(colors[3]) : black)
+        temp.push(this.position.z === 1 ? this.colorFace(colors[4]) : black)
+        temp.push(this.position.z === -1 ? this.colorFace(colors[5]) : black)
         for (let i = 0; i < temp.length; i++) {
             let m = new THREE.MeshBasicMaterial({map: temp[i]})
-            if(this.n === -1) {
+            if(this.determinateCornerOrEdge() === 6 || this.determinateCornerOrEdge() === 0) {
                 m.transparent = true;
                 m.opacity = 0.5
             }
             materials[i] = m
         }
-        // x = -1 alors colors[0][1] / x = 1 alors colors[0][0]
-        // for (let i = 1; i < colors.length; i++) {
-        //     let texture = this.colorFace(colors[i])
-        //     let m = new THREE.MeshBasicMaterial({map: texture})
-        //     if(this.n === -1) {
-        //         m.transparent = true;
-        //         m.opacity = 0.5
-        //     }
-        //     materials[i] = m
-        // }
         return materials
     }
-    // determinateAxisViaMovement(movement) {
-    //     let axis = {x: 0, y: 0, z: 0};
-    //     if(movements[0].indexOf(movement) !== -1) {
-    //         axis.z = 1
-    //     } else if(movements[1].indexOf(movement) !== -1) {
-    //         axis.x = 1
-    //     } else {
-    //         axis.y = 1
-    //     }
-    //     this.rotation = axis
-    //     return axis
-    // }
     determinateAxisViaMovement(a) {
         let axis = {x: 0, y: 0, z: 0};
         axis[a] = 1;
@@ -100,16 +76,6 @@ class Cube {
         this.rotation = axis
         return axis
     }
-    // determineAngleViaMovement(movement) {
-    //     let angle = "";
-    //     if(angles.indexOf(movement) === -1) {
-    //         angle = Math.PI/2
-    //     } else {
-    //         angle = -(Math.PI/2)
-    //     }
-    //     this.angle = angle
-    //     return angle
-    // }
     rotateOnAxis(axisString, angle, movement) {
         let axis = this.determinateAxisViaMovement(axisString)
         if(movement === "U" || movement === "D") {
@@ -122,27 +88,27 @@ class Cube {
     translateCube(angle, axis) {
         let x, y, z = 0;
         if(axis === "y") {
-            x = this.x * Math.round(Math.cos(angle)) - this.z * Math.sin(angle)
-            z = this.x * Math.sin(angle) + this.z * Math.round(Math.cos(angle))
-            this.x = x
-            this.z = z
+            x = this.position.x * Math.round(Math.cos(angle)) - this.position.z * Math.sin(angle)
+            z = this.position.x * Math.sin(angle) + this.position.z * Math.round(Math.cos(angle))
+            this.position.x = x
+            this.position.z = z
         } else if (axis === "x") {
-            y = this.y * Math.round(Math.cos(angle)) - this.z * Math.sin(angle)
-            z = this.y * Math.sin(angle) + this.z * Math.round(Math.cos(angle))
-            this.y = y
-            this.z = z
+            y = this.position.y * Math.round(Math.cos(angle)) - this.position.z * Math.sin(angle)
+            z = this.position.y * Math.sin(angle) + this.position.z * Math.round(Math.cos(angle))
+            this.position.y = y
+            this.position.z = z
         } else if (axis === "z") {
-            x = this.x * Math.round(Math.cos(angle)) - this.y * Math.sin(angle)
-            y = this.x * Math.sin(angle) + this.y * Math.round(Math.cos(angle))
-            this.x = x
-            this.y = y
+            x = this.position.x * Math.round(Math.cos(angle)) - this.position.y * Math.sin(angle)
+            y = this.position.x * Math.sin(angle) + this.position.y * Math.round(Math.cos(angle))
+            this.position.x = x
+            this.position.y = y
         }
 
         // console.log([this.x, this.y, this.z, this.n])
 
-        this.cube.position.x = this.x === -0 ? 0 : this.x
-        this.cube.position.y = this.y === -0 ? 0 : this.y
-        this.cube.position.z = this.z === -0 ? 0 : this.z
+        this.cube.position.x = this.position.x === -0 ? 0 : this.position.x
+        this.cube.position.y = this.position.y === -0 ? 0 : this.position.y
+        this.cube.position.z = this.position.z === -0 ? 0 : this.position.z
     }
     update(movement) {
         let reverse = 0
@@ -158,27 +124,48 @@ class Cube {
         this.translateCube(angle, axis)
     }
     determinateCornerOrEdge() {
-        let type = Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z)
+        let type = Math.abs(this.position.x) + Math.abs(this.position.y) + Math.abs(this.position.z)
         if(type === 3) {
-            return "corner"
+            return 6
         } else if(type === 2) {
-            return "edge"
+            return 2
         }
-        return "center"
+        return 0
+    }
+    determinateFaceFromPosition() {
+        let temp = []
+        if(this.position.x === 1) temp.push("R")
+        if(this.position.x === -1) temp.push("L")
+        if(this.position.y === 1) temp.push("U")
+        if(this.position.y === -1) temp.push("D")
+        if(this.position.z === 1) temp.push("F")
+        if(this.position.z === -1) temp.push("B")
+
+        return temp
     }
     show() {
         const geometry = new THREE.BoxGeometry(1, 1, 1)
         this.cube = new THREE.Mesh(geometry, this.face())
 
-        this.cube.position.x = this.x
-        this.cube.position.y = this.y
-        this.cube.position.z = this.z
+        this.cube.position.x = this.position.x
+        this.cube.position.y = this.position.y
+        this.cube.position.z = this.position.z
 
         this.cube.rotation.x = this.rotation[0]
         this.cube.rotation.y = this.rotation[1]
         this.cube.rotation.z = this.rotation[2]
 
-        console.log(this.n, this.determinateCornerOrEdge(), {x: this.x, y: this.y, z: this.z})
+        let nFaces = this.determinateCornerOrEdge()
+
+        let plane = nFaces > 0 ? Array.from({length: nFaces }, () => {
+            return [this.position.x, this.position.y, this.position.z]
+        }) : ""
+
+        // let x = this.position.x + (this.position.x/2)
+        // let y = this.position.y + (this.position.y/2)
+        // let z = this.position.z + (this.position.z/2)
+
+        console.log(this.determinateFaceFromPosition())
 
         return this.cube
     }

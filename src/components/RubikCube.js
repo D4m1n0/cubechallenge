@@ -52,10 +52,30 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         group.rotation.y = 0.5
         // group.rotation.z = Math.PI
 
-        let clickBox = new ClickBox(1.75, -1.5, 1, 0, "x")
-        let clickBox2 = new ClickBox(1.75, -1.5, 0, 1, "x")
-        group.add(clickBox.show())
-        group.add(clickBox2.show())
+        // -1 1 1
+
+        let clickBox3 = new ClickBox(-1.5,  2,    1, 1, "y")    // F
+        let clickBox = new ClickBox( -2,    1.5,  1, 0, "x")      // F'
+        let clickBox4 = new ClickBox(-1,    1.5,  2, 1, "x") // L
+        let clickBox2 = new ClickBox(-1,    2,    1.5, 1, "")    // L'
+        let clickBox5 = new ClickBox(-2,    1,    1.5, 1, "")     // U
+        let clickBox6 = new ClickBox(-1.5,  1,    2, 1, "y")   // U'
+        // group.add(clickBox.show())
+        // group.add(clickBox2.show())
+        // group.add(clickBox3.show())
+        // group.add(clickBox4.show())
+        // group.add(clickBox5.show())
+        // group.add(clickBox6.show())
+
+        for (let z = 1; z >= -1; z-- ) {
+            for (let y = 1; y >= -1; y--) {
+                for (let x = -1; x <= 1; x++ ) {
+                    if(Math.abs(x) + Math.abs(y) + Math.abs(z) === 3) {
+                        console.log(x/2, y/2, z/2)
+                    }
+                }
+            }
+        }
 
         let movements = scramble.split(" ");
 

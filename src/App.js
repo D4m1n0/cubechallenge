@@ -23,9 +23,9 @@ function App() {
         for (let z = 1; z >= -1; z-- ) {
             for (let y = 1; y >= -1; y--) {
                 for (let x = -1; x <= 1; x++ ) {
-                    cube[index].x = x;
-                    cube[index].y = y;
-                    cube[index].z = z;
+                    cube[index].position.x = x;
+                    cube[index].position.y = y;
+                    cube[index].position.z = z;
                     cube[index].n = index;
                     index++;
                 }
@@ -75,7 +75,7 @@ function App() {
     return (
         <div className="App">
             {
-                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} getCubesFromMovement={getCubesFromMovement} scramble={"B"} /> ) : ""
+                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} getCubesFromMovement={getCubesFromMovement} scramble={""} /> ) : ""
             }
         </div>
     );

@@ -16,7 +16,7 @@ class ClickBox {
         })
     }
     show() {
-        const geometry = new THREE.PlaneGeometry( 0.5, 0.8 );
+        const geometry = new THREE.PlaneGeometry( 1, 1 );
         const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
         material.transparent = true;
         material.opacity = 0.5
@@ -26,7 +26,10 @@ class ClickBox {
         this.obj.position.y = this.y
         this.obj.position.z = this.z
         this.obj.name = this.n
-        this.obj.rotation[this.axis] = Math.PI/2
+        this.axis = this.axis.split(" ")
+        for (let i = 0; i < this.axis.length; i++) {
+            this.obj.rotation[this.axis[i]] = Math.PI/2
+        }
         // this.obj.rotation.y = Math.PI/2
         // this.obj.rotation.z = Math.PI/2
 
