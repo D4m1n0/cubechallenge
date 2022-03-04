@@ -9,15 +9,15 @@ const colors = [
     "#3D81F6"  // z = -1
 ]
 const MOVEMENTS = {
-    "R": ["x", -(Math.PI/2)],
-    "L": ["x", Math.PI/2],
-    "M": ["x", Math.PI/2],
-    "U": ["y", Math.PI/2],
-    "D": ["y", -(Math.PI/2)],
-    "E": ["y", Math.PI/2],
-    "F": ["z", -(Math.PI/2)],
-    "B": ["z", Math.PI/2],
-    "S": ["z", -(Math.PI/2)]
+    "R": -(Math.PI/2),
+    "L": Math.PI/2,
+    "M": Math.PI/2,
+    "U": Math.PI/2,
+    "D": -(Math.PI/2),
+    "E": Math.PI/2,
+    "F": -(Math.PI/2),
+    "B": Math.PI/2,
+    "S": -(Math.PI/2),
 }
 
 class Cube {
@@ -110,14 +110,14 @@ class Cube {
         this.cube.position.y = this.position.y === -0 ? 0 : this.position.y
         this.cube.position.z = this.position.z === -0 ? 0 : this.position.z
     }
-    update(movement) {
+    update(movement, axis) {
         let reverse = 0
         if(movement.indexOf("'") > -1) {
             reverse = 1
             movement = movement.replace("'", "")
         }
-        let axis = MOVEMENTS[movement][0];
-        let angle = reverse ? -MOVEMENTS[movement][1] : MOVEMENTS[movement][1]
+        // let axis = MOVEMENTS[movement][0];
+        let angle = reverse ? -MOVEMENTS[movement] : MOVEMENTS[movement]
         this.angle = angle
 
         this.rotateOnAxis(axis, angle, movement);

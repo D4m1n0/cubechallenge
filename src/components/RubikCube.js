@@ -19,7 +19,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
 
         let cubeMovement = getCubesFromMovement(movement)
         for (let i = 0; i < cubeMovement.length; i++) {
-            cubeMovement[i].update(movement)
+            cubeMovement[i][0].update(movement, cubeMovement[i][1])
         }
         setTimeout(() => {
             if(index < movements.length-1) {
@@ -117,13 +117,14 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
                     p2 = intersects[0].object.position
                     // TODO remove normal from {p1} and {p2}
                     // TODO know what is != between {p1} and {p2}
-                    // TODO same = axis, different = face
+                    // TODO same = axis, different = direction
+                    // TODO axis = layer,
                     // TODO find movement with face and axis
-                    let cubeMovement = getCubesFromMovement([1, "z"])
-                    for (let i = 0; i < cubeMovement.length; i++) {
-                        cubeMovement[i].update("F")
-                    }
-                    // console.log(p1, p2, normal)
+                    // let cubeMovement = getCubesFromMovement([1, "z"])
+                    // for (let i = 0; i < cubeMovement.length; i++) {
+                    //     cubeMovement[i][0].update("F", cubeMovement[i][1])
+                    // }
+                    console.log(p1, p2, normal)
                 }
                 if(e.type !== "pointermove") controls.enableRotate = !controls.enableRotate
 

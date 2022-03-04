@@ -68,7 +68,7 @@ function App() {
         }
         for (let i = 0; i < cubes.length; i++) {
             if(cubes[i]["position"][axe] === face) {
-                myCubes.push(cubes[i]);
+                myCubes.push([cubes[i], axe]);
             }
         }
 
@@ -78,7 +78,7 @@ function App() {
     return (
         <div className="App">
             {
-                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} getCubesFromMovement={getCubesFromMovement} scramble={""} /> ) : ""
+                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} getCubesFromMovement={getCubesFromMovement} scramble={"U"} /> ) : ""
             }
         </div>
     );
