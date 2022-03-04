@@ -29,6 +29,19 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         }, 500)
     }
 
+    const maxValue = (obj) => {
+        let max = ["x", obj.x]
+        if(Math.abs(obj.y) > Math.abs(max[1])) {
+            max = ["y", obj.y]
+        }
+        if(Math.abs(obj.z) > Math.abs(max[1])) {
+            max = ["z", obj.z]
+        }
+        max[1] = Math.floor(max[1])
+        max[1] = Math.abs(max[1]) === 2 ? max[1] / 2 : max[1]
+        return max
+    }
+
     useEffect(() => {
         let width = mount.current.clientWidth
         let height = mount.current.clientHeight
@@ -37,8 +50,8 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         const scene = new THREE.Scene()
         const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
         const renderer = new THREE.WebGLRenderer({ antialias: true })
-        const axesHelper = new THREE.AxesHelper( 5 );
-        scene.add( axesHelper );
+        // const axesHelper = new THREE.AxesHelper( 5 );
+        // scene.add( axesHelper );
         const interaction = new Interaction(renderer, scene, camera);
 
         camera.position.z = 10
@@ -51,37 +64,91 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         }
         scene.add(group)
         group.name = "rubik"
-        // group.rotation.x = 0.5
-        // group.rotation.y = 0.5
-        // group.rotation.z = Math.PI
 
         let movements = scramble.split(" ");
 
         movementWithScramble(movements, 0)
         // cubeArray[0].cube.position.x = -2
         // TODO Click for move
+        const mouse = new THREE.Vector2()
+        const raycaster = new THREE.Raycaster()
 
-        // group.on("pointerdown", function(e) {
-        //     controls.enabled = false
-        //     console.log("start", e.data.tangentialPressure )
-        // })
-        // group.on("pointerup", function(e) {
-        //     controls.enabled = true
-        //     console.log("end", e.data.global)
-        // })
-        // group.on("mouseover", function(e) {
-        //     controls.enabled = true
-        //     console.log("in", e.data.global.x, e.data.global.y)
-        // })
-        // group.on("pointerout", function(e) {
-        //     controls.enabled = true
-        //     // console.log("out", e.data.global)
-        // })
+        let normal = []
+        let p1, p2, pSave
+
+        const mousePosition = (e) => {
+            mouse.x = (e.clientX / width) * 2 - 1
+            mouse.y = - (e.clientY / height) * 2 + 1
+            raycaster.setFromCamera( mouse, camera )
+        }
+
+        const pointerOutEvent = (e) => {
+            if(p2 === undefined) {
+                p2 = pSave
+
+                console.log(p1, p2, normal)
+            }
+
+            setTimeout(() => {
+                controls.enableRotate = true
+            }, 500)
+        }
+
+        const pointerMoveEvent = (e) => {
+            mousePosition(e)
+            const intersects = raycaster.intersectObjects( group.children );
+            if(intersects.length > 0) {
+                if(p1 !== undefined) {
+                    pSave = intersects[0].object.position
+                }
+            }
+        }
+
+        const mouseEvent = (e) => {
+            mousePosition(e)
+            const intersects = raycaster.intersectObjects( group.children );
+            if(intersects.length > 0) {
+                // console.log(intersects[0])
+                if(e.type === "mousedown") {
+                    normal = maxValue(intersects[0].point)
+                    p1 = intersects[0].object.position
+                }
+                if(e.type === "mouseup") {
+                    p2 = intersects[0].object.position
+                    // TODO remove normal from {p1} and {p2}
+                    // TODO know what is != between {p1} and {p2}
+                    // TODO same = axis, different = face
+                    // TODO find movement with face and axis
+                    let cubeMovement = getCubesFromMovement([1, "z"])
+                    for (let i = 0; i < cubeMovement.length; i++) {
+                        cubeMovement[i].update("F")
+                    }
+                    // console.log(p1, p2, normal)
+                }
+                if(e.type !== "pointermove") controls.enableRotate = !controls.enableRotate
+
+            }
+        }
+
+        const getFace = (e) => {
+            console.log(e.data.target)
+        }
+
+        window.addEventListener('mousedown', mouseEvent)
+        // group.on('mousedown', getFace)
+        window.addEventListener('mouseup', mouseEvent)
+        window.addEventListener('pointermove', pointerMoveEvent)
+        group.on("pointerout", pointerOutEvent)
 
         renderer.setClearColor('#9f9f9f')
         renderer.setSize(width, height)
 
         const renderScene = () => {
+            raycaster.setFromCamera( mouse, camera )
+            const intersects = raycaster.intersectObjects( scene.children );
+            for (let i = 0; i < intersects.length; i++) {
+                // console.log(intersects[i])
+            }
             renderer.render(scene, camera)
         }
 
