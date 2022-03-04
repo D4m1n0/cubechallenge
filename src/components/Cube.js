@@ -14,7 +14,7 @@ const MOVEMENTS = {
     "M": Math.PI/2,
     "U": Math.PI/2,
     "D": -(Math.PI/2),
-    "E": Math.PI/2,
+    "E": -(Math.PI/2),
     "F": -(Math.PI/2),
     "B": Math.PI/2,
     "S": -(Math.PI/2),
@@ -63,7 +63,7 @@ class Cube {
             let m = new THREE.MeshBasicMaterial({map: temp[i]})
             // if(this.determinateCornerOrEdge() === 6 || this.determinateCornerOrEdge() === 0) {
             //     m.transparent = true;
-            //     m.opacity = 0.5
+            //     m.opacity = 0
             // }
             materials[i] = m
         }
@@ -78,7 +78,7 @@ class Cube {
     }
     rotateOnAxis(axisString, angle, movement) {
         let axis = this.determinateAxisViaMovement(axisString)
-        if(movement === "U" || movement === "D") {
+        if(movement === "U" || movement === "D" || movement === "E") {
             angle = -angle
         }
 
@@ -104,7 +104,7 @@ class Cube {
             this.position.y = y
         }
 
-        // console.log([this.x, this.y, this.z, this.n])
+        // console.log([this.position.x, this.position.y, this.position.z, this.n])
 
         this.cube.position.x = this.position.x === -0 ? 0 : this.position.x
         this.cube.position.y = this.position.y === -0 ? 0 : this.position.y

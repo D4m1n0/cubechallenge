@@ -5,6 +5,24 @@ import {TrackballControls} from "three/examples/jsm/controls/experimental/Camera
 
 const OrbitControls = require('three-orbit-controls')(THREE);
 
+const move = {
+    "x": [
+        ["L", "L'"],
+        ["M", "M'"],
+        ["R'", "R"]
+    ],
+    "y": [
+        ["D'", "D"],
+        ["E'", "E"],
+        ["U", "U'"]
+    ],
+    "z": [
+        ["B", "B'"],
+        ["S", "S'"],
+        ["F'", "F"]
+    ]
+}
+
 const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
     const mount = useRef(null)
     const controls = useRef(null)
@@ -42,6 +60,40 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         return max
     }
 
+    const removeNormal = (obj, normal) => {
+        let returnObj = {x: obj.x, y: obj.y , z: obj.z}
+        delete returnObj[normal]
+
+        return returnObj
+    }
+
+    const moveLayer = (p1, p2, normal) => {
+        let pos1 = removeNormal(p1, normal[0])
+        let pos2 = removeNormal(p2, normal[0])
+        let rotation, axis, direction, layer;
+        let axes = ["x", "y", "z"]
+        for (let i = 0; i < axes.length; i++) {
+            if(pos1[axes[i]] !== undefined) {
+                if(pos1[axes[i]] !== pos2[axes[i]]) {
+                    rotation = axes[i]
+                } else {
+                    axis = axes[i]
+                    layer = p1[axes[i]]
+                }
+            }
+        }
+        if(axis !== undefined && layer !== undefined) {
+            direction = p1[rotation] < p2[rotation] ? 1 : 0
+
+            let movement = move[axis][layer+1][direction]
+            let cubeMovement = getCubesFromMovement([layer, axis])
+            for (let i = 0; i < cubeMovement.length; i++) {
+                cubeMovement[i][0].update(movement, axis)
+            }
+        }
+        return 1
+    }
+
     useEffect(() => {
         let width = mount.current.clientWidth
         let height = mount.current.clientHeight
@@ -50,8 +102,6 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         const scene = new THREE.Scene()
         const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
         const renderer = new THREE.WebGLRenderer({ antialias: true })
-        // const axesHelper = new THREE.AxesHelper( 5 );
-        // scene.add( axesHelper );
         const interaction = new Interaction(renderer, scene, camera);
 
         camera.position.z = 10
@@ -83,10 +133,14 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         }
 
         const pointerOutEvent = (e) => {
-            if(p2 === undefined) {
+            if(p1 !== undefined && p2 === undefined) {
                 p2 = pSave
-
-                console.log(p1, p2, normal)
+                let move = moveLayer(p1, p2, normal)
+                if(move) {
+                    p1 = undefined
+                    p2 = undefined
+                    pSave = undefined
+                }
             }
 
             setTimeout(() => {
@@ -115,16 +169,12 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
                 }
                 if(e.type === "mouseup") {
                     p2 = intersects[0].object.position
-                    // TODO remove normal from {p1} and {p2}
-                    // TODO know what is != between {p1} and {p2}
-                    // TODO same = axis, different = direction
-                    // TODO axis = layer,
-                    // TODO find movement with face and axis
-                    // let cubeMovement = getCubesFromMovement([1, "z"])
-                    // for (let i = 0; i < cubeMovement.length; i++) {
-                    //     cubeMovement[i][0].update("F", cubeMovement[i][1])
-                    // }
-                    console.log(p1, p2, normal)
+                    let move = moveLayer(p1, p2, normal)
+                    if(move) {
+                        p1 = undefined
+                        p2 = undefined
+                        pSave = undefined
+                    }
                 }
                 if(e.type !== "pointermove") controls.enableRotate = !controls.enableRotate
 
