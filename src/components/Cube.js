@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {TweenMax} from  "gsap/TweenMax"
 
 const colors = [
     "#DC422F", // x = 1
@@ -83,6 +84,7 @@ class Cube {
         }
 
         // this.cube.rotateOnAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
+        // TweenMax.to(this.cube.rotation, .5, { [axisString]: angle });
         this.cube.rotateOnWorldAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
     }
     translateCube(angle, axis) {
@@ -116,7 +118,6 @@ class Cube {
             reverse = 1
             movement = movement.replace("'", "")
         }
-        // let axis = MOVEMENTS[movement][0];
         let angle = reverse ? -MOVEMENTS[movement] : MOVEMENTS[movement]
         this.angle = angle
 
