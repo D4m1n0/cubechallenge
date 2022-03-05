@@ -84,7 +84,6 @@ class Cube {
         }
 
         // this.cube.rotateOnAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
-        // TweenMax.to(this.cube.rotation, .5, { [axisString]: angle });
         this.cube.rotateOnWorldAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
     }
     translateCube(angle, axis) {
@@ -106,11 +105,15 @@ class Cube {
             this.position.y = y
         }
 
-        // console.log([this.position.x, this.position.y, this.position.z, this.n])
-
         this.cube.position.x = this.position.x === -0 ? 0 : this.position.x
         this.cube.position.y = this.position.y === -0 ? 0 : this.position.y
         this.cube.position.z = this.position.z === -0 ? 0 : this.position.z
+    }
+    checkOriginalPosition() {
+        if(this.position.x === this.originalPosition.x && this.position.y === this.originalPosition.y && this.position.z === this.originalPosition.z && Math.abs(this.cube.rotation.x) === 0 && Math.abs(this.cube.rotation.y) === 0 && Math.abs(this.cube.rotation.z) === 0) {
+            return 1
+        }
+        return 0
     }
     update(movement, axis) {
         let reverse = 0
@@ -125,13 +128,7 @@ class Cube {
         this.translateCube(angle, axis)
     }
     determinateCornerOrEdge() {
-        let type = Math.abs(this.position.x) + Math.abs(this.position.y) + Math.abs(this.position.z)
-        if(type === 3) {
-            return 6
-        } else if(type === 2) {
-            return 2
-        }
-        return 0
+        return Math.abs(this.position.x) + Math.abs(this.position.y) + Math.abs(this.position.z)
     }
     determinateFaceFromPosition() {
         let temp = []
@@ -144,6 +141,11 @@ class Cube {
 
         return temp
     }
+    setPosition(position, name) {
+        this.position = position
+        this.originalPosition = {x: position.x, y: position.y, z: position.z}
+        this.n = name
+    }
     show() {
         const geometry = new THREE.BoxGeometry(1, 1, 1)
         this.cube = new THREE.Mesh(geometry, this.face())
@@ -153,11 +155,9 @@ class Cube {
         this.cube.position.y = this.position.y
         this.cube.position.z = this.position.z
 
-        this.cube.rotation.x = this.rotation[0]
-        this.cube.rotation.y = this.rotation[1]
-        this.cube.rotation.z = this.rotation[2]
-
-        // console.log(this.determinateFaceFromPosition())
+        this.cube.rotation.x = 0
+        this.cube.rotation.y = 0
+        this.cube.rotation.z = 0
 
         return this.cube
     }

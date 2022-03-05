@@ -15,7 +15,7 @@ function App() {
 
     const buildCubes = () => {
         let cube = Array.from({length: 27}, () => {
-            return new Cube(0, 0, 0, [0, 0, 0]);
+            return new Cube(0, 0, 0, {x: 0, y: 0, z: 0});
         })
 
         let index = 0;
@@ -23,10 +23,7 @@ function App() {
         for (let z = 1; z >= -1; z-- ) {
             for (let y = 1; y >= -1; y--) {
                 for (let x = -1; x <= 1; x++ ) {
-                    cube[index].position.x = x;
-                    cube[index].position.y = y;
-                    cube[index].position.z = z;
-                    cube[index].n = index;
+                    cube[index].setPosition({x: x, y: y, z: z}, index)
                     index++;
                 }
             }
@@ -79,7 +76,7 @@ function App() {
     return (
         <div className="App">
             {
-                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} getCubesFromMovement={getCubesFromMovement} scramble={"F U F2 R2 D2 B2 L2 F2 D B2 D U B L' F' L2 F U' B2 R F'"} /> ) : ""
+                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} getCubesFromMovement={getCubesFromMovement} scramble={"U"} /> ) : ""
             }
         </div>
     );

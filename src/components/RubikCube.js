@@ -37,48 +37,9 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         }
 
         let cubeMovement = getCubesFromMovement(movement)
-        const pivot = new THREE.Object3D()
-        // pivot.rotation.set(0,0,0);
-        // pivot.updateMatrixWorld();
-        group.add(pivot)
         for (let i = 0; i < cubeMovement.length; i++) {
-            pivot.add(cubeMovement[i][0].cube)
-
-            // cubeMovement[i][0].update(movement, cubeMovement[i][1])
+            cubeMovement[i][0].update(movement, cubeMovement[i][1])
         }
-        const MOVEMENTS = {
-            "R": -(Math.PI/2),
-            "L": Math.PI/2,
-            "M": Math.PI/2,
-            "U": Math.PI/2,
-            "D": -(Math.PI/2),
-            "E": -(Math.PI/2),
-            "F": -(Math.PI/2),
-            "B": Math.PI/2,
-            "S": -(Math.PI/2),
-        }
-        let reverse = 0
-        if(movement.indexOf("'") > -1) {
-            reverse = 1
-            movement = movement.replace("'", "")
-        }
-        let angle = reverse ? -MOVEMENTS[movement] : MOVEMENTS[movement]
-        if(movement === "U" || movement === "D" || movement === "E") {
-            angle = -angle
-        }
-        TweenMax.to(pivot.rotation, 1, { [cubeMovement[0][1]]: angle, onComplete: function() {
-                console.log(movement)
-                for (let i = 0; i < cubeMovement.length; i++) {
-                    group.add(cubeMovement[i][0].cube)
-                    pivot.remove(cubeMovement[i][0].cube)
-                    cubeMovement[i][0].update(movement, cubeMovement[i][1])
-                }
-                if(index < movements.length-1) {
-                    index += 1
-                    // movementWithScramble(movements, index)
-                    movementWithScramble(movements, index, group)
-                }
-            } });
 
 
         // setTimeout(() => {
@@ -87,10 +48,10 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         //         movementWithScramble(movements, index)
         //     }
         // }, 500)
-        // if(index < movements.length-1) {
-        //     index += 1
-        //     movementWithScramble(movements, index, group)
-        // }
+        if(index < movements.length-1) {
+            index += 1
+            movementWithScramble(movements, index, group)
+        }
     }
 
     const maxValue = (obj) => {
@@ -137,6 +98,17 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
                 cubeMovement[i][0].update(movement, axis)
             }
         }
+        setTimeout(()=> {
+            let finalCheck = 0
+            for (let i = 0; i < cubeArray.length; i++) {
+                if(cubeArray[i].determinateCornerOrEdge() !== 1) {
+                    finalCheck += cubeArray[i].checkOriginalPosition()
+                }
+            }
+            if(finalCheck === 21) {
+                console.log("CUBE terminé")
+            }
+        }, 500)
         return 1
     }
 
