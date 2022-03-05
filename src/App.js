@@ -3,10 +3,17 @@ import {useEffect, useState} from "react";
 import Cube from "./components/Cube";
 import RubikCube from "./components/RubikCube";
 import {log} from "three/examples/jsm/renderers/nodes/ShaderNode";
+import useInterval from "./hooks/UseInterval";
 
 function App() {
     const [cubes, setCubes] = useState([])
     const [count, setCount] = useState(0)
+    const [isRunning, setIsRunning] = useState(false)
+    const [time, setTime] = useState(false)
+
+    useInterval(() => {
+        setTime(time + 10);
+    }, isRunning ? 10 : null)
 
     useEffect(() => {
         if(cubes.length === 0) {
@@ -75,12 +82,34 @@ function App() {
         return myCubes
     }
 
+    const handleCount = () => {
+        let minutes = Math.floor(time / 60000);
+        let diff = time - (minutes * 60000);
+        let seconds = Math.floor(diff / 1000);
+        diff = diff - (seconds * 1000);
+        let cent = Math.round(diff);
+
+        let returnString = '';
+        if(minutes > 0) {
+            returnString += minutes + ":";
+        }
+        returnString += seconds>9?seconds:'0'+seconds;
+        returnString += ':'+((cent/10)>9?cent/10:'0'+cent/10);
+
+        return (
+            `${returnString}`
+        );
+    };
+
     return (
         <div className="App">
             {
-                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} timeScramble={1} addTurn={(val) => setCount(val)} getCubesFromMovement={getCubesFromMovement} scramble={"B2 R' D2 L U2 F2 R D2 R2 B2 F2 L' D' L D2 B L D' F' R'"} /> ) : ""
+                cubes.length !== 0 ? ( <RubikCube startTimer={(type) => { setIsRunning(type)} } cubeArray={cubes} timeScramble={1} addTurn={(val) => setCount(val)} getCubesFromMovement={getCubesFromMovement} scramble={"U"} /> ) : ""
             }
             <div className="turn">Nombre de mouvements : {count}</div>
+            <div className="timer">
+                <span className="timer__title">{handleCount()}</span>
+            </div>
         </div>
     )
 }

@@ -24,7 +24,7 @@ const move = {
     ]
 }
 
-const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScramble}) => {
+const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScramble, startTimer}) => {
     const mount = useRef(null)
     const controls = useRef(null)
 
@@ -96,17 +96,16 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
                 cubeMovement[i][0].update(movement, axis)
             }
         }
-        setTimeout(()=> {
-            let finalCheck = 0
-            for (let i = 0; i < cubeArray.length; i++) {
-                if(cubeArray[i].determinateCornerOrEdge() !== 1) {
-                    finalCheck += cubeArray[i].checkOriginalPosition()
-                }
+        let finalCheck = 0
+        for (let i = 0; i < cubeArray.length; i++) {
+            if(cubeArray[i].determinateCornerOrEdge() !== 1) {
+                finalCheck += cubeArray[i].checkOriginalPosition()
             }
-            if(finalCheck === 21) {
-                console.log("CUBE end")
-            }
-        }, 500)
+        }
+        if(finalCheck === 21) {
+            console.log("CUBE end")
+            startTimer(false)
+        }
         return 1
     }
 
@@ -148,18 +147,26 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
             raycaster.setFromCamera( mouse, camera )
         }
 
+        const mouseUpOutEvent = () => {
+            let move = moveLayer(p1, p2, normal)
+            if(move) {
+                p1 = undefined
+                p2 = undefined
+                pSave = undefined
+
+                if(count === 0) {
+                    startTimer(true)
+                }
+
+                count += 1
+                addTurn(count)
+            }
+        }
+
         const pointerOutEvent = (e) => {
             if(p1 !== undefined && p2 === undefined) {
                 p2 = pSave
-                let move = moveLayer(p1, p2, normal)
-                if(move) {
-                    p1 = undefined
-                    p2 = undefined
-                    pSave = undefined
-
-                    count += 1
-                    addTurn(count)
-                }
+                mouseUpOutEvent()
             }
 
             setTimeout(() => {
@@ -187,17 +194,9 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
                 }
                 if(e.type === "mouseup") {
                     p2 = intersects[0].object.position
-                    let move = moveLayer(p1, p2, normal)
-                    if(move) {
-                        p1 = undefined
-                        p2 = undefined
-                        pSave = undefined
-
-                        count += 1
-                        addTurn(count)
-                    }
+                    mouseUpOutEvent()
                 }
-                if(e.type !== "pointermove") controls.enableRotate = !controls.enableRotate
+                controls.enableRotate = !controls.enableRotate
 
             }
         }
