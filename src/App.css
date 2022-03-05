@@ -5,6 +5,7 @@
 .App {
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 .rubik {
@@ -13,4 +14,12 @@
   right: 0;
   bottom: 0;
   left: 0;
+}
+
+.turn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: white;
+  font-size: 24px;
 }

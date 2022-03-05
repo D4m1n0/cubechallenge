@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { useRef, useEffect} from "react";
+import {useRef, useEffect} from "react";
 import {Interaction} from "../../node_modules/three.interaction/src/index";
 import {TrackballControls} from "three/examples/jsm/controls/experimental/CameraControls";
 import {TweenMax} from  "gsap/TweenMax"
@@ -24,7 +24,7 @@ const move = {
     ]
 }
 
-const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
+const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScramble}) => {
     const mount = useRef(null)
     const controls = useRef(null)
 
@@ -42,16 +42,14 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         }
 
 
-        // setTimeout(() => {
-        //     if(index < movements.length-1) {
-        //         index += 1
-        //         movementWithScramble(movements, index)
-        //     }
-        // }, 500)
-        if(index < movements.length-1) {
-            index += 1
-            movementWithScramble(movements, index, group)
-        }
+        setTimeout(() => {
+            if(index < movements.length-1) {
+                index += 1
+                movementWithScramble(movements, index, group)
+            } else {
+                group.rotation.z = Math.PI
+            }
+        }, timeScramble)
     }
 
     const maxValue = (obj) => {
@@ -106,7 +104,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
                 }
             }
             if(finalCheck === 21) {
-                console.log("CUBE terminé")
+                console.log("CUBE end")
             }
         }, 500)
         return 1
@@ -121,6 +119,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
         const renderer = new THREE.WebGLRenderer({ antialias: true })
         const interaction = new Interaction(renderer, scene, camera);
+        let count = 0
 
         camera.position.z = 10
         const controls = new TrackballControls(camera, renderer.domElement)
@@ -136,6 +135,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         let movements = scramble.split(" ");
 
         movementWithScramble(movements, 0, group)
+
         const mouse = new THREE.Vector2()
         const raycaster = new THREE.Raycaster()
 
@@ -156,6 +156,9 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
                     p1 = undefined
                     p2 = undefined
                     pSave = undefined
+
+                    count += 1
+                    addTurn(count)
                 }
             }
 
@@ -178,7 +181,6 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
             mousePosition(e)
             const intersects = raycaster.intersectObjects( group.children );
             if(intersects.length > 0) {
-                // console.log(intersects[0])
                 if(e.type === "mousedown") {
                     normal = maxValue(intersects[0].point)
                     p1 = intersects[0].object.position
@@ -190,6 +192,9 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
                         p1 = undefined
                         p2 = undefined
                         pSave = undefined
+
+                        count += 1
+                        addTurn(count)
                     }
                 }
                 if(e.type !== "pointermove") controls.enableRotate = !controls.enableRotate
@@ -197,12 +202,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
             }
         }
 
-        const getFace = (e) => {
-            console.log(e.data.target)
-        }
-
         window.addEventListener('mousedown', mouseEvent)
-        // group.on('mousedown', getFace)
         window.addEventListener('mouseup', mouseEvent)
         window.addEventListener('pointermove', pointerMoveEvent)
         group.on("pointerout", pointerOutEvent)
@@ -212,10 +212,6 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
 
         const renderScene = () => {
             raycaster.setFromCamera( mouse, camera )
-            const intersects = raycaster.intersectObjects( scene.children );
-            for (let i = 0; i < intersects.length; i++) {
-                // console.log(intersects[i])
-            }
             renderer.render(scene, camera)
         }
 
@@ -229,9 +225,6 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble}) => {
         }
 
         const animate = () => {
-            // group.rotation.x += 0.01
-            // group.rotation.y += 0.01
-
             controls.update()
 
             renderScene()

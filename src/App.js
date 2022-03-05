@@ -2,16 +2,18 @@ import './App.css';
 import {useEffect, useState} from "react";
 import Cube from "./components/Cube";
 import RubikCube from "./components/RubikCube";
+import {log} from "three/examples/jsm/renderers/nodes/ShaderNode";
 
 function App() {
     const [cubes, setCubes] = useState([])
+    const [count, setCount] = useState(0)
 
     useEffect(() => {
         if(cubes.length === 0) {
             buildCubes();
         }
 
-    }, [cubes]);
+    }, [cubes])
 
     const buildCubes = () => {
         let cube = Array.from({length: 27}, () => {
@@ -24,12 +26,12 @@ function App() {
             for (let y = 1; y >= -1; y--) {
                 for (let x = -1; x <= 1; x++ ) {
                     cube[index].setPosition({x: x, y: y, z: z}, index)
-                    index++;
+                    index++
                 }
             }
         }
 
-        setCubes(cube);
+        setCubes(cube)
     }
 
     const getCubesFromMovement = (movement) => {
@@ -76,10 +78,11 @@ function App() {
     return (
         <div className="App">
             {
-                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} getCubesFromMovement={getCubesFromMovement} scramble={"U"} /> ) : ""
+                cubes.length !== 0 ? ( <RubikCube cubeArray={cubes} timeScramble={1} addTurn={(val) => setCount(val)} getCubesFromMovement={getCubesFromMovement} scramble={"B2 R' D2 L U2 F2 R D2 R2 B2 F2 L' D' L D2 B L D' F' R'"} /> ) : ""
             }
+            <div className="turn">Nombre de mouvements : {count}</div>
         </div>
-    );
+    )
 }
 
 export default App;
