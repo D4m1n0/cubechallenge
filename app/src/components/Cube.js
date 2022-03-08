@@ -1,5 +1,4 @@
-import * as THREE from "three";
-import {TweenMax} from  "gsap/TweenMax"
+import * as THREE from "three"
 
 const colors = [
     "#DC422F", // x = 1
@@ -13,9 +12,9 @@ const MOVEMENTS = {
     "R": -(Math.PI/2),
     "L": Math.PI/2,
     "M": Math.PI/2,
-    "U": Math.PI/2,
-    "D": -(Math.PI/2),
-    "E": -(Math.PI/2),
+    "U": -(Math.PI/2),
+    "D": Math.PI/2,
+    "E": Math.PI/2,
     "F": -(Math.PI/2),
     "B": Math.PI/2,
     "S": -(Math.PI/2),
@@ -62,7 +61,7 @@ class Cube {
         temp.push(this.position.z === -1 ? this.colorFace(colors[5]) : black)
         for (let i = 0; i < temp.length; i++) {
             let m = new THREE.MeshBasicMaterial({map: temp[i]})
-            // if(this.determinateCornerOrEdge() === 6 || this.determinateCornerOrEdge() === 0) {
+            // if(this.n === 0 || this.n === 6) {
             //     m.transparent = true;
             //     m.opacity = 0
             // }
@@ -79,9 +78,6 @@ class Cube {
     }
     rotateOnAxis(axisString, angle, movement) {
         let axis = this.determinateAxisViaMovement(axisString)
-        if(movement === "U" || movement === "D" || movement === "E") {
-            angle = -angle
-        }
 
         // this.cube.rotateOnAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
         this.cube.rotateOnWorldAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
@@ -91,8 +87,8 @@ class Cube {
         if(axis === "y") {
             x = this.position.x * Math.round(Math.cos(angle)) - this.position.z * Math.sin(angle)
             z = this.position.x * Math.sin(angle) + this.position.z * Math.round(Math.cos(angle))
-            this.position.x = x
-            this.position.z = z
+            this.position.x = -x
+            this.position.z = -z
         } else if (axis === "x") {
             y = this.position.y * Math.round(Math.cos(angle)) - this.position.z * Math.sin(angle)
             z = this.position.y * Math.sin(angle) + this.position.z * Math.round(Math.cos(angle))
@@ -110,9 +106,20 @@ class Cube {
         this.cube.position.z = this.position.z === -0 ? 0 : this.position.z
     }
     checkOriginalPosition() {
-        if(this.position.x === this.originalPosition.x && this.position.y === this.originalPosition.y && this.position.z === this.originalPosition.z && Math.abs(this.cube.rotation.x) === 0 && Math.abs(this.cube.rotation.y) === 0 && Math.abs(this.cube.rotation.z) === 0) {
+        // console.log({
+        //     "posX": this.position.x +" "+ this.originalPosition.x,
+        //     "posY": this.position.y +" "+ this.originalPosition.y,
+        //     "posZ": this.position.z +" "+ this.originalPosition.z,
+        //     "rotX": Math.floor(Math.abs(this.cube.rotation.x)),
+        //     "rotY": Math.floor(Math.abs(this.cube.rotation.y)),
+        //     "rotZ": Math.floor(Math.abs(this.cube.rotation.z)),
+        //     "name": this.n
+        // })
+        if(this.position.x === this.originalPosition.x && this.position.y === this.originalPosition.y && this.position.z === this.originalPosition.z && Math.floor(Math.abs(this.cube.rotation.x)) === 0 && Math.floor(Math.abs(this.cube.rotation.y)) === 0 && Math.floor(Math.abs(this.cube.rotation.z)) === 0) {
+            // console.log({"name": this.n})
             return 1
         }
+        // console.log("----------------------------------")
         return 0
     }
     update(movement, axis) {

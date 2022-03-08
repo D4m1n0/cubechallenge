@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import Cube from "./components/Cube";
 import RubikCube from "./components/RubikCube";
 import useInterval from "./hooks/UseInterval";
+import RotationCube from "./tests/RotationCube";
 
 function App() {
     const [cubes, setCubes] = useState([])
@@ -103,7 +104,15 @@ function App() {
     return (
         <div className="App">
             {
-                cubes.length !== 0 ? ( <RubikCube startTimer={(type) => { setIsRunning(type)} } cubeArray={cubes} timeScramble={1} addTurn={(val) => setCount(val)} getCubesFromMovement={getCubesFromMovement} scramble={"U"} /> ) : ""
+                cubes.length !== 0 ? (
+                    <RubikCube
+                        startTimer={(type) => { setIsRunning(type)} }
+                        cubeArray={cubes} timeScramble={1} addTurn={(val) => setCount(val)}
+                        getCubesFromMovement={getCubesFromMovement} scramble={"U' B2 F2 L2 R2 D R2 D' U2 L F' U B2 U2 L2 U L U"} />
+                ) : ""
+            }
+            {
+                // <RotationCube />
             }
             <div className="turn">Nombre de mouvements : {count}</div>
             <div className="timer">

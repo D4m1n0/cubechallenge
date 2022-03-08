@@ -19,7 +19,7 @@ const move = {
     ],
     "z": [
         ["B", "B'"],
-        ["S", "S'"],
+        ["S'", "S"],
         ["F'", "F"]
     ]
 }
@@ -47,7 +47,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
                 index += 1
                 movementWithScramble(movements, index, group)
             } else {
-                group.rotation.z = Math.PI
+                // group.rotation.z = Math.PI
             }
         }, timeScramble)
     }
@@ -88,9 +88,28 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
             }
         }
         if(axis !== undefined && layer !== undefined) {
-            direction = p1[rotation] < p2[rotation] ? 1 : 0
+            let reverseAxis = [...axes]
+            reverseAxis.splice(reverseAxis.indexOf(rotation), 1)
+            reverseAxis.splice(reverseAxis.indexOf(axis), 1)
+            reverseAxis = reverseAxis[0]
+
+            if(p1[reverseAxis] === 1) {
+                direction = p1[rotation] < p2[rotation] ? 1 : 0
+            } else {
+                direction = p1[rotation] < p2[rotation] ? 0 : 1
+            }
+            if(rotation === "z" && axis === "x") { direction = (-direction)+1 }
+            if(rotation === "z" && axis === "y") { direction = (-direction)+1 }
+            if(rotation === "y" && axis === "z") { direction = (-direction)+1 }
 
             let movement = move[axis][layer+1][direction]
+            // console.log({
+            //     movement: movement,
+            //     layer: layer+1,
+            //     dir: direction,
+            //     rot: rotation,
+            //     axis: axis
+            // })
             let cubeMovement = getCubesFromMovement([layer, axis])
             for (let i = 0; i < cubeMovement.length; i++) {
                 cubeMovement[i][0].update(movement, axis)
@@ -102,6 +121,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
                 finalCheck += cubeArray[i].checkOriginalPosition()
             }
         }
+        console.log(finalCheck)
         if(finalCheck === 21) {
             console.log("CUBE end")
             startTimer(false)
@@ -117,7 +137,7 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
         const scene = new THREE.Scene()
         const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
         const renderer = new THREE.WebGLRenderer({ antialias: true })
-        const interaction = new Interaction(renderer, scene, camera);
+        const interaction = new Interaction(renderer, scene, camera)
         let count = 0
 
         camera.position.z = 10
