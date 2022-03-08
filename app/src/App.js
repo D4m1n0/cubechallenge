@@ -2,7 +2,6 @@ import './App.css';
 import {useEffect, useState} from "react";
 import Cube from "./components/Cube";
 import RubikCube from "./components/RubikCube";
-import {log} from "three/examples/jsm/renderers/nodes/ShaderNode";
 import useInterval from "./hooks/UseInterval";
 
 function App() {
