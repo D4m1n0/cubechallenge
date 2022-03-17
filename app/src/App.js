@@ -3,7 +3,6 @@ import {useEffect, useState} from "react";
 import Cube from "./components/Cube";
 import RubikCube from "./components/RubikCube";
 import useInterval from "./hooks/UseInterval";
-import RotationCube from "./tests/RotationCube";
 
 function App() {
     const [cubes, setCubes] = useState([])
@@ -41,47 +40,6 @@ function App() {
         setCubes(cube)
     }
 
-    const getCubesFromMovement = (movement) => {
-        let myCubes = [];
-        let face;
-        let axe;
-
-        if(Array.isArray(movement)) {
-            face = movement[0]
-            axe = movement[1]
-        }else {
-            switch (movement) {
-                case "F": face = 1; axe = "z"; break;
-                case "F'": face = 1; axe = "z"; break;
-                case "B": face = -1; axe = "z"; break;
-                case "B'": face = -1; axe = "z"; break;
-                case "S": face = 0; axe = "z"; break;
-                case "S'": face = 0; axe = "z"; break;
-                case "U": face = 1; axe = "y"; break;
-                case "U'": face = 1; axe = "y"; break;
-                case "D": face = -1; axe = "y"; break;
-                case "D'": face = -1; axe = "y"; break;
-                case "E": face = 0; axe = "y"; break;
-                case "E'": face = 0; axe = "y"; break;
-                case "L": face = -1; axe = "x"; break;
-                case "L'": face = -1; axe = "x"; break;
-                case "R": face = 1; axe = "x"; break;
-                case "R'": face = 1; axe = "x"; break;
-                case "M": face = 0; axe = "x"; break;
-                case "M'": face = 0; axe = "x"; break;
-                default: face = 0; break;
-            }
-        }
-
-        for (let i = 0; i < cubes.length; i++) {
-            if(cubes[i]["position"][axe] === face) {
-                myCubes.push([cubes[i], axe]);
-            }
-        }
-
-        return myCubes
-    }
-
     const handleCount = () => {
         let minutes = Math.floor(time / 60000);
         let diff = time - (minutes * 60000);
@@ -107,12 +65,10 @@ function App() {
                 cubes.length !== 0 ? (
                     <RubikCube
                         startTimer={(type) => { setIsRunning(type)} }
-                        cubeArray={cubes} timeScramble={1} addTurn={(val) => setCount(val)}
-                        getCubesFromMovement={getCubesFromMovement} scramble={"U' B2 F2 L2 R2 D R2 D' U2 L F' U B2 U2 L2 U L U"} />
+                        cubes={cubes}
+                        addTurn={(val) => setCount(val)}
+                        scramble={"U' B2 F2 L2 R2 D R2 D' U2 L F' U B2 U2 L2 U L U"} />
                 ) : ""
-            }
-            {
-                // <RotationCube />
             }
             <div className="turn">Nombre de mouvements : {count}</div>
             <div className="timer">

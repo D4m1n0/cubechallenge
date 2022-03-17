@@ -27,7 +27,7 @@ class Cube {
         this.rotation = rotation;
         this.angle = 0
     }
-    colorFace(color) {
+    faceColor(color) {
         let canvas = document.createElement('canvas');
         canvas.width = 128;
         canvas.height = 128;
@@ -51,14 +51,15 @@ class Cube {
     }
     face () {
         let materials = Array.from({length:6}, () => { return 1 })
-        let black = this.colorFace("#000000");
+        let black = this.faceColor("#000000");
+        // TODO Refactor this temp array but how?
         let temp = []
-        temp.push(this.position.x === 1 ? this.colorFace(colors[0]) : black)
-        temp.push(this.position.x === -1 ? this.colorFace(colors[1]) : black)
-        temp.push(this.position.y === 1 ? this.colorFace(colors[2]) : black)
-        temp.push(this.position.y === -1 ? this.colorFace(colors[3]) : black)
-        temp.push(this.position.z === 1 ? this.colorFace(colors[4]) : black)
-        temp.push(this.position.z === -1 ? this.colorFace(colors[5]) : black)
+        temp.push(this.position.x === 1 ? this.faceColor(colors[0]) : black)
+        temp.push(this.position.x === -1 ? this.faceColor(colors[1]) : black)
+        temp.push(this.position.y === 1 ? this.faceColor(colors[2]) : black)
+        temp.push(this.position.y === -1 ? this.faceColor(colors[3]) : black)
+        temp.push(this.position.z === 1 ? this.faceColor(colors[4]) : black)
+        temp.push(this.position.z === -1 ? this.faceColor(colors[5]) : black)
         for (let i = 0; i < temp.length; i++) {
             let m = new THREE.MeshBasicMaterial({map: temp[i]})
             // if(this.n === 0 || this.n === 6) {
@@ -78,13 +79,12 @@ class Cube {
     }
     rotateOnAxis(axisString, angle, movement) {
         let axis = this.determinateAxisViaMovement(axisString)
-
-        // this.cube.rotateOnAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
         this.cube.rotateOnWorldAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
     }
     translateCube(angle, axis) {
         let x, y, z = 0;
         if(axis === "y") {
+            // TODO why rotation y is inverse?
             x = this.position.x * Math.round(Math.cos(angle)) - this.position.z * Math.sin(angle)
             z = this.position.x * Math.sin(angle) + this.position.z * Math.round(Math.cos(angle))
             this.position.x = -x
@@ -106,20 +106,10 @@ class Cube {
         this.cube.position.z = this.position.z === -0 ? 0 : this.position.z
     }
     checkOriginalPosition() {
-        // console.log({
-        //     "posX": this.position.x +" "+ this.originalPosition.x,
-        //     "posY": this.position.y +" "+ this.originalPosition.y,
-        //     "posZ": this.position.z +" "+ this.originalPosition.z,
-        //     "rotX": Math.floor(Math.abs(this.cube.rotation.x)),
-        //     "rotY": Math.floor(Math.abs(this.cube.rotation.y)),
-        //     "rotZ": Math.floor(Math.abs(this.cube.rotation.z)),
-        //     "name": this.n
-        // })
+        // TODO refactor this condition
         if(this.position.x === this.originalPosition.x && this.position.y === this.originalPosition.y && this.position.z === this.originalPosition.z && Math.floor(Math.abs(this.cube.rotation.x)) === 0 && Math.floor(Math.abs(this.cube.rotation.y)) === 0 && Math.floor(Math.abs(this.cube.rotation.z)) === 0) {
-            // console.log({"name": this.n})
             return 1
         }
-        // console.log("----------------------------------")
         return 0
     }
     update(movement, axis) {

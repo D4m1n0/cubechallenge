@@ -2,9 +2,6 @@ import * as THREE from "three";
 import {useRef, useEffect} from "react";
 import {Interaction} from "../../node_modules/three.interaction/src/index";
 import {TrackballControls} from "three/examples/jsm/controls/experimental/CameraControls";
-import {TweenMax} from  "gsap/TweenMax"
-
-const OrbitControls = require('three-orbit-controls')(THREE);
 
 const move = {
     "x": [
@@ -24,105 +21,138 @@ const move = {
     ]
 }
 
-const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScramble, startTimer}) => {
+const RubikCube = (props) => {
     const mount = useRef(null)
     const controls = useRef(null)
+    const {cubes, scramble, addTurn, startTimer} = props
 
-    const movementWithScramble = (movements, index, group) => {
+    const getCubesFromMovement = (movement) => {
+        let cubesToMove = [];
+        let face;
+        let axe;
+
+        if(Array.isArray(movement)) {
+            // Movement made by user
+            face = movement[0]
+            axe = movement[1]
+        }else {
+            // Movement made by scramble
+            switch (movement) {
+                case "F":   face = 1;   axe = "z"; break;
+                case "F'":  face = 1;   axe = "z"; break;
+                case "B":   face = -1;  axe = "z"; break;
+                case "B'":  face = -1;  axe = "z"; break;
+                case "S":   face = 0;   axe = "z"; break;
+                case "S'":  face = 0;   axe = "z"; break;
+                case "U":   face = 1;   axe = "y"; break;
+                case "U'":  face = 1;   axe = "y"; break;
+                case "D":   face = -1;  axe = "y"; break;
+                case "D'":  face = -1;  axe = "y"; break;
+                case "E":   face = 0;   axe = "y"; break;
+                case "E'":  face = 0;   axe = "y"; break;
+                case "L":   face = -1;  axe = "x"; break;
+                case "L'":  face = -1;  axe = "x"; break;
+                case "R":   face = 1;   axe = "x"; break;
+                case "R'":  face = 1;   axe = "x"; break;
+                case "M":   face = 0;   axe = "x"; break;
+                case "M'":  face = 0;   axe = "x"; break;
+                default:    face = 0; break;
+            }
+        }
+
+        for (let i = 0; i < cubes.length; i++) {
+            if(cubes[i]["position"][axe] === face) {
+                cubesToMove.push([cubes[i], axe])
+            }
+        }
+
+        return cubesToMove
+    }
+
+    const setScramble = (movements, index) => {
         let double = movements[index].indexOf("2") > -1 ? 1 : 0
         let movement = double ? movements[index].replace("2", "") : movements[index]
         movements[index] = movement
+
         if(double) {
             movements.splice(index, 0, movement)
         }
 
-        let cubeMovement = getCubesFromMovement(movement)
-        for (let i = 0; i < cubeMovement.length; i++) {
-            cubeMovement[i][0].update(movement, cubeMovement[i][1])
+        let cubesToMove = getCubesFromMovement(movement)
+        for (let i = 0; i < cubesToMove.length; i++) {
+            cubesToMove[i][0].update(movement, cubesToMove[i][1])
         }
 
-
-        setTimeout(() => {
-            if(index < movements.length-1) {
-                index += 1
-                movementWithScramble(movements, index, group)
-            } else {
-                // group.rotation.z = Math.PI
-            }
-        }, timeScramble)
+        if(index < movements.length-1) {
+            index += 1
+            setScramble(movements, index)
+        }
     }
 
-    const maxValue = (obj) => {
-        let max = ["x", obj.x]
-        if(Math.abs(obj.y) > Math.abs(max[1])) {
-            max = ["y", obj.y]
+    const determinationFaceOnClick = (vector) => {
+        let face = ["x", vector.x]
+        if(Math.abs(vector.y) > Math.abs(face[1])) {
+            face = ["y", vector.y]
         }
-        if(Math.abs(obj.z) > Math.abs(max[1])) {
-            max = ["z", obj.z]
+        if(Math.abs(vector.z) > Math.abs(face[1])) {
+            face = ["z", vector.z]
         }
-        max[1] = Math.floor(max[1])
-        max[1] = Math.abs(max[1]) === 2 ? max[1] / 2 : max[1]
-        return max
+        face[1] = Math.floor(face[1])
+        face[1] = Math.abs(face[1]) === 2 ? face[1] / 2 : face[1]
+        return face
     }
 
-    const removeNormal = (obj, normal) => {
-        let returnObj = {x: obj.x, y: obj.y , z: obj.z}
-        delete returnObj[normal]
+    const removePoint = (vector, faceOnClick) => {
+        let returnObj = {x: vector.x, y: vector.y , z: vector.z}
+        delete returnObj[faceOnClick]
 
         return returnObj
     }
 
-    const moveLayer = (p1, p2, normal) => {
-        let pos1 = removeNormal(p1, normal[0])
-        let pos2 = removeNormal(p2, normal[0])
-        let rotation, axis, direction, layer;
+    const moveLayer = (p1, p2, faceOnClick) => {
+        let pos1 = removePoint(p1, faceOnClick[0])
+        let pos2 = removePoint(p2, faceOnClick[0])
+        let directionOfRotation, axisOfRotation, direction, layer;
         let axes = ["x", "y", "z"]
         for (let i = 0; i < axes.length; i++) {
             if(pos1[axes[i]] !== undefined) {
                 if(pos1[axes[i]] !== pos2[axes[i]]) {
-                    rotation = axes[i]
+                    directionOfRotation = axes[i]
                 } else {
-                    axis = axes[i]
+                    axisOfRotation = axes[i]
                     layer = p1[axes[i]]
                 }
             }
         }
-        if(axis !== undefined && layer !== undefined) {
+
+        if(axisOfRotation !== undefined && layer !== undefined) {
             let reverseAxis = [...axes]
-            reverseAxis.splice(reverseAxis.indexOf(rotation), 1)
-            reverseAxis.splice(reverseAxis.indexOf(axis), 1)
+            reverseAxis.splice(reverseAxis.indexOf(directionOfRotation), 1)
+            reverseAxis.splice(reverseAxis.indexOf(axisOfRotation), 1)
             reverseAxis = reverseAxis[0]
 
             if(p1[reverseAxis] === 1) {
-                direction = p1[rotation] < p2[rotation] ? 1 : 0
+                direction = p1[directionOfRotation] < p2[directionOfRotation] ? 1 : 0
             } else {
-                direction = p1[rotation] < p2[rotation] ? 0 : 1
+                direction = p1[directionOfRotation] < p2[directionOfRotation] ? 0 : 1
             }
-            if(rotation === "z" && axis === "x") { direction = (-direction)+1 }
-            if(rotation === "z" && axis === "y") { direction = (-direction)+1 }
-            if(rotation === "y" && axis === "z") { direction = (-direction)+1 }
+            if(directionOfRotation === "z" && axisOfRotation === "x") { direction = (-direction)+1 }
+            if(directionOfRotation === "z" && axisOfRotation === "y") { direction = (-direction)+1 }
+            if(directionOfRotation === "y" && axisOfRotation === "z") { direction = (-direction)+1 }
 
-            let movement = move[axis][layer+1][direction]
-            // console.log({
-            //     movement: movement,
-            //     layer: layer+1,
-            //     dir: direction,
-            //     rot: rotation,
-            //     axis: axis
-            // })
-            let cubeMovement = getCubesFromMovement([layer, axis])
+            let movement = move[axisOfRotation][layer+1][direction]
+            let cubeMovement = getCubesFromMovement([layer, axisOfRotation])
             for (let i = 0; i < cubeMovement.length; i++) {
-                cubeMovement[i][0].update(movement, axis)
+                cubeMovement[i][0].update(movement, axisOfRotation)
             }
         }
-        let finalCheck = 0
-        for (let i = 0; i < cubeArray.length; i++) {
-            if(cubeArray[i].determinateCornerOrEdge() !== 1) {
-                finalCheck += cubeArray[i].checkOriginalPosition()
+        let locationCheck = 0
+        for (let i = 0; i < cubes.length; i++) {
+            if(cubes[i].determinateCornerOrEdge() !== 1) {
+                locationCheck += cubes[i].checkOriginalPosition()
             }
         }
-        console.log(finalCheck)
-        if(finalCheck === 21) {
+        if(locationCheck === 21) {
             console.log("CUBE end")
             startTimer(false)
         }
@@ -135,31 +165,31 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
         let frameId
 
         const scene = new THREE.Scene()
+
         const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
+        camera.position.z = 10
+
         const renderer = new THREE.WebGLRenderer({ antialias: true })
         const interaction = new Interaction(renderer, scene, camera)
-        let count = 0
 
-        camera.position.z = 10
         const controls = new TrackballControls(camera, renderer.domElement)
         controls.enablePan = false
-        let group = new THREE.Object3D()
 
-        for (let i = 0; i < cubeArray.length; i++) {
-            group.add(cubeArray[i].show())
+        let group = new THREE.Object3D()
+        for (let i = 0; i < cubes.length; i++) {
+            group.add(cubes[i].show())
         }
         scene.add(group)
         group.name = "rubik"
 
         let movements = scramble.split(" ");
-
-        movementWithScramble(movements, 0, group)
+        setScramble(movements, 0)
 
         const mouse = new THREE.Vector2()
         const raycaster = new THREE.Raycaster()
 
-        let normal = []
-        let p1, p2, pSave
+        let faceOnClick = []
+        let position1, position2, positionSave
 
         const mousePosition = (e) => {
             mouse.x = (e.clientX / width) * 2 - 1
@@ -167,12 +197,13 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
             raycaster.setFromCamera( mouse, camera )
         }
 
+        let count = 0
         const mouseUpOutEvent = () => {
-            let move = moveLayer(p1, p2, normal)
+            let move = moveLayer(position1, position2, faceOnClick)
             if(move) {
-                p1 = undefined
-                p2 = undefined
-                pSave = undefined
+                position1 = undefined
+                position2 = undefined
+                positionSave = undefined
 
                 if(count === 0) {
                     startTimer(true)
@@ -184,8 +215,8 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
         }
 
         const pointerOutEvent = (e) => {
-            if(p1 !== undefined && p2 === undefined) {
-                p2 = pSave
+            if(position1 !== undefined && position2 === undefined) {
+                position2 = positionSave
                 mouseUpOutEvent()
             }
 
@@ -198,8 +229,8 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
             mousePosition(e)
             const intersects = raycaster.intersectObjects( group.children );
             if(intersects.length > 0) {
-                if(p1 !== undefined) {
-                    pSave = intersects[0].object.position
+                if(position1 !== undefined) {
+                    positionSave = intersects[0].object.position
                 }
             }
         }
@@ -209,11 +240,11 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
             const intersects = raycaster.intersectObjects( group.children );
             if(intersects.length > 0) {
                 if(e.type === "mousedown") {
-                    normal = maxValue(intersects[0].point)
-                    p1 = intersects[0].object.position
+                    faceOnClick = determinationFaceOnClick(intersects[0].point)
+                    position1 = intersects[0].object.position
                 }
                 if(e.type === "mouseup") {
-                    p2 = intersects[0].object.position
+                    position2 = intersects[0].object.position
                     mouseUpOutEvent()
                 }
                 controls.enableRotate = !controls.enableRotate
@@ -265,16 +296,9 @@ const RubikCube = ({cubeArray, getCubesFromMovement, scramble, addTurn, timeScra
         window.addEventListener('resize', handleResize)
         start()
 
-        // controls.current = { start, stop }
-
         return () => {
             stop()
             window.removeEventListener('resize', handleResize)
-            // mount.current.removeChild(renderer.domElement)
-
-            // scene.remove(cube)
-            // geometry.dispose()
-            // material.dispose()
         }
     }, [])
 
