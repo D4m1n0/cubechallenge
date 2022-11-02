@@ -9,6 +9,11 @@ function App() {
     const [count, setCount] = useState(0)
     const [isRunning, setIsRunning] = useState(false)
     const [time, setTime] = useState(false)
+    const cubeLength = 3
+    const spacing = cubeLength !== 2 ? -2 : 0
+    const positionOffset = (cubeLength - 1) / 2
+    const delta = (cubeLength + spacing)
+    const maxPosition = positionOffset * delta
 
     useInterval(() => {
         setTime(time + 10);
@@ -22,21 +27,32 @@ function App() {
     }, [cubes])
 
     const buildCubes = () => {
-        let cube = Array.from({length: 27}, () => {
+        let cube = Array.from({length: cubeLength**3}, () => {
             return new Cube(0, 0, 0, {x: 0, y: 0, z: 0});
         })
 
         let index = 0;
 
-        for (let z = 1; z >= -1; z-- ) {
-            for (let y = 1; y >= -1; y--) {
-                for (let x = -1; x <= 1; x++ ) {
-                    cube[index].setPosition({x: x, y: y, z: z}, index)
+        for (let i = 0; i < cubeLength; i++) {
+            for (let j = 0; j < cubeLength; j++) {
+                for (let k = 0; k < cubeLength; k++) {
+                    let x = (i - positionOffset) * delta
+                    let y = (j - positionOffset) * delta
+                    let z = (k - positionOffset) * delta
+                    if(Math.max(Math.abs(x), Math.abs(y)) === maxPosition || Math.max(Math.abs(y), Math.abs(z)) === maxPosition) {
+                        cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
+                        cube[index].setSize(delta)
+                        if(index !== 26) cube[index].setVisible(false)
+                    } else {
+                        // cube[index] = null
+                        cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
+                        cube[index].setSize(delta)
+                    }
                     index++
                 }
             }
         }
-
+        cube = cube.filter((el) => el !== null)
         setCubes(cube)
     }
 
@@ -59,6 +75,8 @@ function App() {
         );
     };
 
+    // R2 U2 R2 U R2 U R F2 U' U' L U' R' U R U' L U2 L' U2 R' U2 R U R' U R U' R2 L2 U' D
+    // L U' U U' L L' U2 R' U2 U R' U U' R2 D
     return (
         <div className="App">
             {
@@ -67,7 +85,11 @@ function App() {
                         startTimer={(type) => { setIsRunning(type)} }
                         cubes={cubes}
                         addTurn={(val) => setCount(val)}
-                        scramble={"U' B2 F2 L2 R2 D R2 D' U2 L F' U B2 U2 L2 U L U"} />
+                        scramble={"U2"}
+                        maxPosition={maxPosition}
+                        delta={delta}
+                        cubeLength={cubeLength}
+                    />
                 ) : ""
             }
             <div className="turn">Nombre de mouvements : {count}</div>

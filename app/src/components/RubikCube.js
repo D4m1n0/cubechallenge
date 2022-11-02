@@ -24,7 +24,7 @@ const move = {
 const RubikCube = (props) => {
     const mount = useRef(null)
     const controls = useRef(null)
-    const {cubes, scramble, addTurn, startTimer} = props
+    const {cubes, scramble, addTurn, startTimer, maxPosition, delta, cubeLength} = props
 
     const getCubesFromMovement = (movement) => {
         let cubesToMove = [];
@@ -37,42 +37,114 @@ const RubikCube = (props) => {
             axe = movement[1]
         }else {
             // Movement made by scramble
+            // console.log(maxPosition, delta)
             switch (movement) {
-                case "F":   face = 1;   axe = "z"; break;
-                case "F'":  face = 1;   axe = "z"; break;
-                case "B":   face = -1;  axe = "z"; break;
-                case "B'":  face = -1;  axe = "z"; break;
-                case "S":   face = 0;   axe = "z"; break;
+                case "F":
+                case "F'":  face = maxPosition;   axe = "z"; break;
+                case "f":
+                case "f'":  face = maxPosition-delta;   axe = "z"; break;
+                case "3f":
+                case "3f'":  face = maxPosition-(delta*2);   axe = "z"; break;
+                case "Fw":
+                case "Fw'":  face = [maxPosition, maxPosition-delta];   axe = "z"; break;
+
+                case "B":
+                case "B'":  face = -maxPosition;  axe = "z"; break;
+                case "b":
+                case "b'":  face = -maxPosition+delta;  axe = "z"; break;
+                case "3b":
+                case "3b'":  face = -maxPosition+(delta*2);  axe = "z"; break;
+                case "Bw":
+                case "Bw'":  face = [-maxPosition, -maxPosition+delta];   axe = "z"; break;
+
+                case "U":
+                case "U'":  face = maxPosition;   axe = "y"; break;
+                case "u":
+                case "u'":   face = maxPosition-delta;   axe = "y"; break;
+                case "3u":
+                case "3u'":   face = maxPosition-(delta*2);   axe = "y"; break;
+                case "Uw":
+                case "Uw'":   face = [maxPosition, maxPosition-delta];   axe = "y"; break;
+
+                case "D":
+                case "D'":  face = -maxPosition;  axe = "y"; break;
+                case "d":
+                case "d'":  face = -maxPosition+delta;  axe = "y"; break;
+                case "3d":
+                case "3d'":  face = -maxPosition+(delta*2);  axe = "y"; break;
+                case "Dw":
+                case "Dw'":  face = [-maxPosition, -maxPosition+delta];   axe = "y"; break;
+
+                case "L":
+                case "L'":  face = -maxPosition;  axe = "x"; break;
+                case "l":
+                case "l'":  face = -maxPosition+delta;  axe = "x"; break;
+                case "3l":
+                case "3l'":  face = -maxPosition+(delta*2);  axe = "x"; break;
+                case "Lw":
+                case "Lw'":  face = [-maxPosition, -maxPosition+delta];   axe = "x"; break;
+
+                case "R":
+                case "R'":  face = maxPosition;   axe = "x"; break;
+                case "r":
+                case "r'":  face = maxPosition-delta;   axe = "x"; break;
+                case "3r":
+                case "3r'":  face = maxPosition-(delta*2);   axe = "x"; break;
+                case "Rw":
+                case "Rw'":  face = [maxPosition, maxPosition-delta];   axe = "x"; break;
+
+                case "S":
                 case "S'":  face = 0;   axe = "z"; break;
-                case "U":   face = 1;   axe = "y"; break;
-                case "U'":  face = 1;   axe = "y"; break;
-                case "D":   face = -1;  axe = "y"; break;
-                case "D'":  face = -1;  axe = "y"; break;
-                case "E":   face = 0;   axe = "y"; break;
+                case "E":
                 case "E'":  face = 0;   axe = "y"; break;
-                case "L":   face = -1;  axe = "x"; break;
-                case "L'":  face = -1;  axe = "x"; break;
-                case "R":   face = 1;   axe = "x"; break;
-                case "R'":  face = 1;   axe = "x"; break;
-                case "M":   face = 0;   axe = "x"; break;
+                case "M":
                 case "M'":  face = 0;   axe = "x"; break;
                 default:    face = 0; break;
             }
         }
 
         for (let i = 0; i < cubes.length; i++) {
-            if(cubes[i]["position"][axe] === face) {
-                cubesToMove.push([cubes[i], axe])
+            if(Array.isArray(face)) {
+                for (let j = 0; j < face.length; j++) {
+                    if(cubes[i]["position"][axe] === face[j]) {
+                        cubesToMove.push([cubes[i], axe])
+                    }
+                }
+            }else {
+                if(cubes[i]["position"][axe] === face) {
+                    cubesToMove.push([cubes[i], axe])
+                }
             }
         }
 
         return cubesToMove
     }
 
+    const getComplicatedMovement = (axisOfRotation, layer, direction) => {
+        let movement = move[axisOfRotation][Math.sign(layer)+1][direction]
+        let maxPositionTemp = maxPosition;
+        let deltaTemp = delta;
+        if(Math.sign(layer) === -1) {
+            maxPositionTemp = -maxPositionTemp;
+            deltaTemp = -deltaTemp;
+        }
+        if(Math.sign(layer) !== 0) {
+            switch (layer) {
+                case maxPositionTemp-deltaTemp: movement = movement.toLowerCase(); break;
+                case maxPositionTemp-(deltaTemp*2): movement = "3"+movement.toLowerCase(); break;
+                // default: console.log("same"); break;
+            }
+        }
+        // console.log(movement)
+
+        return movement
+    }
+
     const setScramble = (movements, index) => {
         let double = movements[index].indexOf("2") > -1 ? 1 : 0
         let movement = double ? movements[index].replace("2", "") : movements[index]
         movements[index] = movement
+        console.log("move", movement)
 
         if(double) {
             movements.splice(index, 0, movement)
@@ -85,7 +157,9 @@ const RubikCube = (props) => {
 
         if(index < movements.length-1) {
             index += 1
-            setScramble(movements, index)
+            setTimeout(() => {
+                setScramble(movements, index)
+            }, 2000)
         }
     }
 
@@ -131,7 +205,7 @@ const RubikCube = (props) => {
             reverseAxis.splice(reverseAxis.indexOf(axisOfRotation), 1)
             reverseAxis = reverseAxis[0]
 
-            if(p1[reverseAxis] === 1) {
+            if(Math.sign(p1[reverseAxis]) === 1) {
                 direction = p1[directionOfRotation] < p2[directionOfRotation] ? 1 : 0
             } else {
                 direction = p1[directionOfRotation] < p2[directionOfRotation] ? 0 : 1
@@ -139,19 +213,14 @@ const RubikCube = (props) => {
             if(directionOfRotation === "z" && axisOfRotation === "x") { direction = (-direction)+1 }
             if(directionOfRotation === "z" && axisOfRotation === "y") { direction = (-direction)+1 }
             if(directionOfRotation === "y" && axisOfRotation === "z") { direction = (-direction)+1 }
-
-            let movement = move[axisOfRotation][layer+1][direction]
+            let movement = getComplicatedMovement(axisOfRotation, layer, direction)
             let cubeMovement = getCubesFromMovement([layer, axisOfRotation])
             for (let i = 0; i < cubeMovement.length; i++) {
                 cubeMovement[i][0].update(movement, axisOfRotation)
             }
         }
         let locationCheck = 0
-        for (let i = 0; i < cubes.length; i++) {
-            if(cubes[i].determinateCornerOrEdge() !== 1) {
-                locationCheck += cubes[i].checkOriginalPosition()
-            }
-        }
+
         if(locationCheck === 21) {
             console.log("CUBE end")
             startTimer(false)
@@ -165,9 +234,16 @@ const RubikCube = (props) => {
         let frameId
 
         const scene = new THREE.Scene()
+        const axesHelper = new THREE.AxesHelper( 20 );
+        scene.add( axesHelper );
+        const size = 10;
+        const divisions = 10;
+
+        const gridHelper = new THREE.GridHelper( size, divisions );
+        scene.add( gridHelper );
 
         const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-        camera.position.z = 10
+        camera.position.z = 15
 
         const renderer = new THREE.WebGLRenderer({ antialias: true })
         const interaction = new Interaction(renderer, scene, camera)
@@ -206,7 +282,7 @@ const RubikCube = (props) => {
                 positionSave = undefined
 
                 if(count === 0) {
-                    startTimer(true)
+                    // startTimer(true)
                 }
 
                 count += 1
@@ -248,7 +324,6 @@ const RubikCube = (props) => {
                     mouseUpOutEvent()
                 }
                 controls.enableRotate = !controls.enableRotate
-
             }
         }
 
