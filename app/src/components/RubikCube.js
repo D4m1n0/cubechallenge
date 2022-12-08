@@ -159,7 +159,7 @@ const RubikCube = (props) => {
             index += 1
             setTimeout(() => {
                 setScramble(movements, index)
-            }, 2000)
+            }, 1)
         }
     }
 

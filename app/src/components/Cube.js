@@ -74,13 +74,30 @@ class Cube {
     }
     rotateOnAxis(axisString, angle) {
         let axis = this.determinateAxisViaMovement(axisString)
-        // this.cube.rotateOnWorldAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
-        this.cube.rotateOnAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
+        // if(this.n === 0) {
+        //     console.log("THIS2", this.cube.getWorldDirection(new THREE.Vector3(0, 0, 0)), this.cube.position)
+        // }
+        this.cube.rotateOnWorldAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
+        // this.cube.rotateOnAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
+        // this.cube.rotation.set(axis.x, axis.y, axis.z)
+        // this.cube.setRotationFromAxisAngle(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
         this.rotation.x = this.cube.rotation.x
         this.rotation.y = this.cube.rotation.y
         this.rotation.z = this.cube.rotation.z
-        if(this.n === 26) {
-            console.log(this.rotation, Math.sin(this.rotation.y), Math.cos(this.rotation.y))
+        if(this.n === 0) {
+            let quat = new THREE.Quaternion()
+            const worldQuaternion = this.cube.getWorldQuaternion(quat)
+            const eulerQuaternion = new THREE.Euler()
+            const test = eulerQuaternion.setFromQuaternion(worldQuaternion)
+            let eulerX = Math.round(test.x * 10000) / 10000
+            let eulerY = Math.round(test.y * 10000) / 10000
+            let eulerZ = Math.round(test.z * 10000) / 10000
+            // const worldRotation = worldQuaternion.toEulerAngles()
+            // console.log("THIS", this.cube.getWorldDirection(new THREE.Vector3(0, 0, 0)), this.cube.position)
+            // Get orientation
+            // console.log(Math.round(eulerX * (180/Math.PI)), Math.round(eulerY * (180/Math.PI)), Math.round(eulerZ * (180/Math.PI)))
+            // console.log(Math.abs(this.cube.getWorldQuaternion(new THREE.Quaternion()).y) === Math.PI)
+            // console.log(this.cube.localToWorld(new THREE.Vector3()))
         }
     }
     translateCube(angle, axis) {
@@ -105,9 +122,15 @@ class Cube {
         this.cube.position.x = this.position.x === -0 ? 0 : this.position.x
         this.cube.position.y = this.position.y === -0 ? 0 : this.position.y
         this.cube.position.z = this.position.z === -0 ? 0 : this.position.z
-    }
-    checkOriginalPosition() {
 
+        let worldDir = this.cube.getWorldDirection(new THREE.Vector3(0, 0, 0))
+
+        if(this.n === 0) {
+            console.log("THIS2", worldDir.z)
+        }
+    }
+    checkOriginalPosition(group) {
+        console.log(this.cube.getWorldQuaternion(group))
     }
     update(movement, axis) {
         let reverse = 0
@@ -118,7 +141,7 @@ class Cube {
         let angle = reverse ? -MOVEMENTS[movement] : MOVEMENTS[movement]
 
         this.rotateOnAxis(axis, angle)
-        // this.translateCube(angle, axis)
+        this.translateCube(angle, axis)
     }
     setPosition(position, name, maxPosition) {
         this.position = position
@@ -157,7 +180,9 @@ class Cube {
         const geometry = new THREE.BoxGeometry(this.size, this.size, this.size)
         const axesHelper = new THREE.AxesHelper( 5 );
         this.cube = new THREE.Mesh(geometry, this.face())
-        this.cube.add(axesHelper)
+        if(this.n === 0) {
+            this.cube.add(axesHelper)
+        }
         this.cube.name = this.n
 
         this.cube.position.x = this.position.x

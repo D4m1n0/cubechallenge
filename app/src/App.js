@@ -42,7 +42,7 @@ function App() {
                     if(Math.max(Math.abs(x), Math.abs(y)) === maxPosition || Math.max(Math.abs(y), Math.abs(z)) === maxPosition) {
                         cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
                         cube[index].setSize(delta)
-                        if(index !== 26) cube[index].setVisible(false)
+                        // cube[index].setVisible(true)
                     } else {
                         // cube[index] = null
                         cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
@@ -85,7 +85,7 @@ function App() {
                         startTimer={(type) => { setIsRunning(type)} }
                         cubes={cubes}
                         addTurn={(val) => setCount(val)}
-                        scramble={"U2"}
+                        scramble={""}
                         maxPosition={maxPosition}
                         delta={delta}
                         cubeLength={cubeLength}
