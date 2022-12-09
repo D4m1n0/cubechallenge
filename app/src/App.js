@@ -42,7 +42,7 @@ function App() {
                     if(Math.max(Math.abs(x), Math.abs(y)) === maxPosition || Math.max(Math.abs(y), Math.abs(z)) === maxPosition) {
                         cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
                         cube[index].setSize(delta)
-                        // cube[index].setVisible(true)
+                        // cube[index].setVisible(false)
                     } else {
                         // cube[index] = null
                         cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
@@ -77,6 +77,7 @@ function App() {
 
     // R2 U2 R2 U R2 U R F2 U' U' L U' R' U R U' L U2 L' U2 R' U2 R U R' U R U' R2 L2 U' D
     // L U' U U' L L' U2 R' U2 U R' U U' R2 D
+    // U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R' U' L F' B R L U2 L2 U L U' L' U L R U R2 U' R D2 L' U L U2 L' U' L D U F U F' U L' U' L R U R' U R' F R F' U2 R' F R F' U2 L U2 L' U2 L F' L' U' L U L F L2
     return (
         <div className="App">
             {
@@ -85,7 +86,7 @@ function App() {
                         startTimer={(type) => { setIsRunning(type)} }
                         cubes={cubes}
                         addTurn={(val) => setCount(val)}
-                        scramble={""}
+                        scramble={"U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R' U' L F' B R L U2 L2 U L U' L' U L R U R2 U' R D2 L' U L U2 L' U' L D U F U F' U L' U' L R U R' U R' F R F' U2 R' F R F' U2 L U2 L' U2 L F' L' U' L U L F L2"}
                         maxPosition={maxPosition}
                         delta={delta}
                         cubeLength={cubeLength}

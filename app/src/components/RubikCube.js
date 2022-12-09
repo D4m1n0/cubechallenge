@@ -2,6 +2,7 @@ import * as THREE from "three";
 import {useRef, useEffect} from "react";
 import {Interaction} from "../../node_modules/three.interaction/src/index";
 import {TrackballControls} from "three/examples/jsm/controls/experimental/CameraControls";
+import {max} from "three/examples/jsm/renderers/nodes/ShaderNode";
 
 const move = {
     "x": [
@@ -116,6 +117,7 @@ const RubikCube = (props) => {
                 }
             }
         }
+        cubesToMove.push([cubes[13], axe])
 
         return cubesToMove
     }
@@ -135,7 +137,6 @@ const RubikCube = (props) => {
                 // default: console.log("same"); break;
             }
         }
-        // console.log(movement)
 
         return movement
     }
@@ -144,7 +145,7 @@ const RubikCube = (props) => {
         let double = movements[index].indexOf("2") > -1 ? 1 : 0
         let movement = double ? movements[index].replace("2", "") : movements[index]
         movements[index] = movement
-        console.log("move", movement)
+        // console.log("move", movement)
 
         if(double) {
             movements.splice(index, 0, movement)
@@ -160,6 +161,15 @@ const RubikCube = (props) => {
             setTimeout(() => {
                 setScramble(movements, index)
             }, 1)
+        } else {
+            // cubes[0].getMaterials()
+            // console.log(cubes[17].cube)
+            // cubes[17].getOrientation()
+            // console.log(cubes[14].cube.position)
+            // cubes[17].getWDirection()
+            // cubes[17].getOrientation()
+            // cubes[8].getWDirection()
+            // cubes[8].getOrientation()
         }
     }
 
@@ -181,6 +191,19 @@ const RubikCube = (props) => {
         delete returnObj[faceOnClick]
 
         return returnObj
+    }
+
+    const checkFinishedCube = () => {
+        const cubeIndicator = {x: cubes[14].cube.position.x, y: cubes[14].cube.position.y, z: cubes[14].cube.position.z}
+        let maxKey = "x"
+        if(cubeIndicator.y === 1) maxKey = "y"
+        else if(cubeIndicator.z === 1) maxKey = "z"
+
+        for (let i = 0; i < cubes.length; i++) {
+            let cubeWorldDirection = cubes[i].getWDirection()
+            console.log(cubeWorldDirection)
+        }
+        console.log(maxKey, cubeIndicator)
     }
 
     const moveLayer = (p1, p2, faceOnClick) => {
@@ -219,12 +242,13 @@ const RubikCube = (props) => {
                 cubeMovement[i][0].update(movement, axisOfRotation)
             }
         }
-        let locationCheck = 0
-
-        if(locationCheck === 21) {
-            console.log("CUBE end")
-            startTimer(false)
-        }
+        checkFinishedCube()
+        // let locationCheck = 0
+        //
+        // if(locationCheck === 21) {
+        //     console.log("CUBE end")
+        //     startTimer(false)
+        // }
         return 1
     }
 
@@ -235,7 +259,7 @@ const RubikCube = (props) => {
 
         const scene = new THREE.Scene()
         const axesHelper = new THREE.AxesHelper( 20 );
-        scene.add( axesHelper );
+        // scene.add( axesHelper );
         const size = 10;
         const divisions = 10;
 
