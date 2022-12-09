@@ -9,7 +9,7 @@ function App() {
     const [count, setCount] = useState(0)
     const [isRunning, setIsRunning] = useState(false)
     const [time, setTime] = useState(false)
-    const cubeLength = 3
+    const cubeLength = 4
     const spacing = cubeLength !== 2 ? -2 : 0
     const positionOffset = (cubeLength - 1) / 2
     const delta = (cubeLength + spacing)
@@ -33,20 +33,21 @@ function App() {
 
         let index = 0;
 
-        for (let i = 0; i < cubeLength; i++) {
+        for (let i = cubeLength-1; i >= 0; i--) {
             for (let j = 0; j < cubeLength; j++) {
                 for (let k = 0; k < cubeLength; k++) {
-                    let x = (i - positionOffset) * delta
+                    let x = (k - positionOffset) * delta
                     let y = (j - positionOffset) * delta
-                    let z = (k - positionOffset) * delta
+                    let z = (i - positionOffset) * delta
+
                     if(Math.max(Math.abs(x), Math.abs(y)) === maxPosition || Math.max(Math.abs(y), Math.abs(z)) === maxPosition) {
                         cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
                         cube[index].setSize(delta)
                         // cube[index].setVisible(false)
                     } else {
-                        // cube[index] = null
-                        cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
-                        cube[index].setSize(delta)
+                        cube[index] = null
+                        // cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
+                        // cube[index].setSize(delta)
                     }
                     index++
                 }
@@ -86,7 +87,8 @@ function App() {
                         startTimer={(type) => { setIsRunning(type)} }
                         cubes={cubes}
                         addTurn={(val) => setCount(val)}
-                        scramble={"U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R' U' L F' B R L U2 L2 U L U' L' U L R U R2 U' R D2 L' U L U2 L' U' L D U F U F' U L' U' L R U R' U R' F R F' U2 R' F R F' U2 L U2 L' U2 L F' L' U' L U L F L2"}
+                        scramble={"U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R' U' L F' B R L U2 L2 U L U' L' U L R U R2 U' R D2 L' U L U2 L' U' L D U F U F' U L' U' L R U R' U R' F R F' U2 R' F R F' U2 L U2 L' U2 L F' L' U' L U L F L"}
+                        // scramble={""}
                         maxPosition={maxPosition}
                         delta={delta}
                         cubeLength={cubeLength}

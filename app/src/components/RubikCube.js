@@ -2,7 +2,6 @@ import * as THREE from "three";
 import {useRef, useEffect} from "react";
 import {Interaction} from "../../node_modules/three.interaction/src/index";
 import {TrackballControls} from "three/examples/jsm/controls/experimental/CameraControls";
-import {max} from "three/examples/jsm/renderers/nodes/ShaderNode";
 
 const move = {
     "x": [
@@ -117,7 +116,6 @@ const RubikCube = (props) => {
                 }
             }
         }
-        cubesToMove.push([cubes[13], axe])
 
         return cubesToMove
     }
@@ -194,16 +192,35 @@ const RubikCube = (props) => {
     }
 
     const checkFinishedCube = () => {
-        const cubeIndicator = {x: cubes[14].cube.position.x, y: cubes[14].cube.position.y, z: cubes[14].cube.position.z}
+        let cube
+        if(cubeLength !== 2 && cubeLength%2 !== 0) {
+            cube = cubes.filter((obj) => obj.originalPosition.x === 0 && obj.originalPosition.y === 0 && obj.originalPosition.z === maxPosition ? obj : '')[0]
+        } else {
+            cube = cubes.filter((obj) => obj.type === "center")[0]
+        }
+
+        const cubeIndicator = {x: cube.cube.position.x, y: cube.cube.position.y, z: cube.cube.position.z}
         let maxKey = "x"
-        if(cubeIndicator.y === 1) maxKey = "y"
-        else if(cubeIndicator.z === 1) maxKey = "z"
+        if(cubeIndicator.z === maxPosition) maxKey = "z"
+        else if(cubeIndicator.y === maxPosition) maxKey = "y"
 
         for (let i = 0; i < cubes.length; i++) {
             let cubeWorldDirection = cubes[i].getWDirection()
-            console.log(cubeWorldDirection)
+            if(cubes[i].type === "center") {
+                console.log(cubeWorldDirection[0], cubeWorldDirection[1], cubes[i])
+                // get position (maxPosition)
+                // get other cubes with the same position
+                // check if these cubes have the same name
+                // get other cubes with opposite position
+                // get axis
+                // check
+            } else if(cubeWorldDirection[1][maxKey] === 1) {
+                console.log(cubeWorldDirection[0], cubeWorldDirection[1], "cube ok")
+            } else {
+                console.log(cubeWorldDirection[0], cubes[i].type, cubeWorldDirection[1], "cube wrong")
+            }
+            // console.log(cubeWorldDirection)
         }
-        console.log(maxKey, cubeIndicator)
     }
 
     const moveLayer = (p1, p2, faceOnClick) => {

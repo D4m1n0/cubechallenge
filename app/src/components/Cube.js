@@ -24,10 +24,13 @@ const MOVEMENTS = {
 class Cube {
     constructor(x, y, z, rotation, n) {
         this.position = {x: x, y: y, z: z}
-        this.n = n
+        this.originalPosition = {x: x, y: y, z: z}
+        this.num = n
         this.size = 1
         this.type = ""
+        this.subtype = ""
         this.originalColor = 0
+        this.originalLayer = ""
         this.rotation = rotation
     }
     faceColor(color, i) {
@@ -44,10 +47,10 @@ class Cube {
         ctx.closePath();
 
         ctx.beginPath();
-        ctx.font = "40px Arial";
+        ctx.font = "60px Arial";
         ctx.fillStyle = "black";
         ctx.textAlign = "center";
-        ctx.fillText(this.n + "-" + i, canvas.width / 2, (canvas.height / 2) + 20);
+        ctx.fillText(this.num, canvas.width / 2, (canvas.height / 2) + 20);
         ctx.closePath();
 
         let image = new Image();
@@ -93,7 +96,7 @@ class Cube {
         this.rotation.x = this.cube.rotation.x
         this.rotation.y = this.cube.rotation.y
         this.rotation.z = this.cube.rotation.z
-        if(this.n === 0) {
+        if(this.num === 0) {
             let quat = new THREE.Quaternion()
             const worldQuaternion = this.cube.getWorldQuaternion(quat)
             const eulerQuaternion = new THREE.Euler()
@@ -142,7 +145,7 @@ class Cube {
         // }
     }
     getWDirection() {
-        return [this.n, this.worldDirection]
+        return [this.num, this.worldDirection]
     }
     getMaterials() {
         console.log(this.cube.material)
@@ -167,6 +170,12 @@ class Cube {
         this.rotateOnAxis(axis, angle)
         this.translateCube(angle, axis)
     }
+    getLayer(cubePosition, maxPosition) {
+        const layers = [["L", "R"], ["D", "U"], ["B", "F"]]
+        let layerIndex = cubePosition.findIndex((el) => Math.abs(el) === maxPosition)
+        let layer = Math.sign(cubePosition[layerIndex]) < 0 ? 0 : 1
+        return layers[layerIndex][layer]
+    }
     setPosition(position, name, maxPosition) {
         this.position = position
         this.originalPosition = {x: position.x, y: position.y, z: position.z}
@@ -183,14 +192,24 @@ class Cube {
             this.originalColor = colorCenterIndex
             // this.originalColor = colors[colorCenterIndex]
             if(calculatedTypeArray.filter(x => x===0).length === 2) {
-                this.type = "center-stoic"
-            } else if(calculatedTypeArray.filter(x => x===0).length === 1) {
-                this.type = "center-edge"
+                this.type = "center"
+                this.subtype = "center-stoic"
             } else {
-                this.type = "center-corner"
+                this.originalLayer = this.getLayer(calculatedTypeArray, maxPosition)
+
+                if(calculatedTypeArray.filter(x => x===0).length === 1) {
+                    this.type = "center"
+                    this.subtype = "center-edge"
+                } else if(calculatedTypeArray.filter(x => x===0).length === 3) {
+                    this.type = "center"
+                    this.subtype = "center-center"
+                } else {
+                    this.type = "center"
+                    this.subtype = "center-corner"
+                }
             }
         }
-        this.n = name
+        this.num = name
     }
     setSize(size) {
         this.size = size
@@ -208,7 +227,7 @@ class Cube {
         // if(this.n === 4 || this.n === 14 || this.n === 12 || this.n === 16 || this.n === 10 || this.n === 22) {
         //     this.cube.add(axesHelper)
         // }
-        this.cube.name = this.n
+        this.cube.name = this.num
 
         this.cube.position.x = this.position.x
         this.cube.position.y = this.position.y
