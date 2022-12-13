@@ -9,7 +9,7 @@ function App() {
     const [count, setCount] = useState(0)
     const [isRunning, setIsRunning] = useState(false)
     const [time, setTime] = useState(false)
-    const cubeLength = 4
+    const cubeLength = 5
     const spacing = cubeLength !== 2 ? -2 : 0
     const positionOffset = (cubeLength - 1) / 2
     const delta = (cubeLength + spacing)
@@ -79,6 +79,7 @@ function App() {
     // R2 U2 R2 U R2 U R F2 U' U' L U' R' U R U' L U2 L' U2 R' U2 R U R' U R U' R2 L2 U' D
     // L U' U U' L L' U2 R' U2 U R' U U' R2 D
     // U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R' U' L F' B R L U2 L2 U L U' L' U L R U R2 U' R D2 L' U L U2 L' U' L D U F U F' U L' U' L R U R' U R' F R F' U2 R' F R F' U2 L U2 L' U2 L F' L' U' L U L F L2
+    // solve U' L F' B R L U2 L2 U L U' L' U L R U R2 U' R D2 L' U L U2 L' U' L D U F U F' U L' U' L R U R' U R' F R F' U2 R' F R F' U2 L U2 L' U2 L F' L' U' L U L F L
     return (
         <div className="App">
             {

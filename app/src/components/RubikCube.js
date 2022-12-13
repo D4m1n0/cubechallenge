@@ -20,6 +20,7 @@ const move = {
         ["F'", "F"]
     ]
 }
+const originalCube = [ ["L", "R"], ["D", "U"], ["B", "F"] ]
 
 const RubikCube = (props) => {
     const mount = useRef(null)
@@ -193,6 +194,7 @@ const RubikCube = (props) => {
 
     const checkFinishedCube = () => {
         let cube
+        // If odd cube, get center element at position {x: 0, y: 0, z: 1}
         if(cubeLength !== 2 && cubeLength%2 !== 0) {
             cube = cubes.filter((obj) => obj.originalPosition.x === 0 && obj.originalPosition.y === 0 && obj.originalPosition.z === maxPosition ? obj : '')[0]
         } else {
@@ -200,27 +202,81 @@ const RubikCube = (props) => {
         }
 
         const cubeIndicator = {x: cube.cube.position.x, y: cube.cube.position.y, z: cube.cube.position.z}
-        let maxKey = "x"
-        if(cubeIndicator.z === maxPosition) maxKey = "z"
-        else if(cubeIndicator.y === maxPosition) maxKey = "y"
+        const maxKey = Object.keys(cubeIndicator).reduce((a, b) => cubeIndicator[a] > cubeIndicator[b] ? a : b)
+        let centerArray = [ [[], []], [[], []], [[], []] ]
+        let wrongCubes = 0
 
         for (let i = 0; i < cubes.length; i++) {
             let cubeWorldDirection = cubes[i].getWDirection()
             if(cubes[i].type === "center") {
-                console.log(cubeWorldDirection[0], cubeWorldDirection[1], cubes[i])
-                // get position (maxPosition)
-                // get other cubes with the same position
-                // check if these cubes have the same name
-                // get other cubes with opposite position
-                // get axis
-                // check
-            } else if(cubeWorldDirection[1][maxKey] === 1) {
-                console.log(cubeWorldDirection[0], cubeWorldDirection[1], "cube ok")
+                // console.log(cubeWorldDirection[0], cubeWorldDirection[1], cubes[i])
+                const cubePosition = cubes[i].position
+                const cubeMaxPosition = Object.keys(cubePosition).filter((a) => Math.abs(cubePosition[a]) === maxPosition ? a : "")[0]
+                const cubeSignPosition = Math.sign(cubePosition[cubeMaxPosition]) === -1 ? 0 : 1
+                let cubeMaxPositionNumber = 0
+                if(cubeMaxPosition === "y") cubeMaxPositionNumber = 1
+                else if(cubeMaxPosition === "z") cubeMaxPositionNumber = 2
+                centerArray[cubeMaxPositionNumber][cubeSignPosition].push(cubes[i])
             } else {
-                console.log(cubeWorldDirection[0], cubes[i].type, cubeWorldDirection[1], "cube wrong")
+                if(cubeWorldDirection[1][maxKey] === 1) {
+                    // console.log(cubeWorldDirection[0], cubeWorldDirection[1], "cube ok")
+                } else {
+                    // console.log(cubeWorldDirection[0], cubes[i].type, cubeWorldDirection[1], "cube wrong")
+                    wrongCubes++
+                }
             }
-            // console.log(cubeWorldDirection)
         }
+
+        let centerAtGoodPlace = 0
+        let evenCenter = [ [], [], [] ]
+        const nCenter = (centerArray[0][0].length * 6) - 6
+
+        if(cubeLength > 3) {
+            for (let i = 0; i < centerArray.length; i++) {
+                for (let j = 0; j < centerArray[i].length; j++) {
+                    let centerIndicator = centerArray[i][j][0]
+                    evenCenter[i].push(centerIndicator.originalLayer)
+                    for (let k = 1; k < centerArray[i][j].length; k++) {
+                        const center = centerArray[i][j][k]
+                        if(center.originalLayer === centerIndicator.originalLayer) {
+                            centerAtGoodPlace++
+                        }
+                    }
+                }
+            }
+        }
+
+        let checkAxisCenter = 0
+        if(cubeLength !== 2 && cubeLength%2 === 0) {
+            for (let i = 0; i < evenCenter.length; i++) {
+                for (let j = 0; j < evenCenter.length; j++) {
+                    if (JSON.stringify(evenCenter[i]) === JSON.stringify(originalCube[j])) {
+                        checkAxisCenter++
+                    } else {
+                        originalCube[j].reverse()
+                        if (JSON.stringify(evenCenter[i]) === JSON.stringify(originalCube[j])) {
+                            checkAxisCenter++
+                        }
+                    }
+                }
+            }
+        }
+        if(wrongCubes === 0) {
+            console.log("3x3 is correct")
+        }
+        if(cubeLength > 3) {
+            if(centerAtGoodPlace === nCenter) {
+                if(cubeLength%2 !== 0) {
+                    console.log("odd cube centers are correct")
+                } else {
+                    if(checkAxisCenter === 3) {
+                        console.log("even cube centers are correct")
+                    }
+                }
+            }
+        }
+        // console.log(centerAtGoodPlace, nCenter, checkAxisCenter, wrongCubes)
+        // console.log(evenCenter, originalCube)
     }
 
     const moveLayer = (p1, p2, faceOnClick) => {

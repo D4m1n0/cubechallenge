@@ -25,6 +25,7 @@ class Cube {
     constructor(x, y, z, rotation, n) {
         this.position = {x: x, y: y, z: z}
         this.originalPosition = {x: x, y: y, z: z}
+        this.worldDirection = {x: 0, y: 0, z: 1}
         this.num = n
         this.size = 1
         this.type = ""
@@ -191,11 +192,12 @@ class Cube {
             if(Math.sign(calculatedTypeArray[indexArray]) === -1) colorCenterIndex = (indexArray*2)+1
             this.originalColor = colorCenterIndex
             // this.originalColor = colors[colorCenterIndex]
+            this.originalLayer = this.getLayer(calculatedTypeArray, maxPosition)
             if(calculatedTypeArray.filter(x => x===0).length === 2) {
                 this.type = "center"
                 this.subtype = "center-stoic"
             } else {
-                this.originalLayer = this.getLayer(calculatedTypeArray, maxPosition)
+                // this.originalLayer = this.getLayer(calculatedTypeArray, maxPosition)
 
                 if(calculatedTypeArray.filter(x => x===0).length === 1) {
                     this.type = "center"
