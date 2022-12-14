@@ -8,8 +8,10 @@ function App() {
     const [cubes, setCubes] = useState([])
     const [count, setCount] = useState(0)
     const [isRunning, setIsRunning] = useState(false)
+    const [isFinish, setIsFinish] = useState(false)
     const [time, setTime] = useState(0)
-    const cubeLength = 3
+    const [timeTable, setTimeTable] = useState([])
+    const [cubeLength, setCubeLength] = useState(3)
     const spacing = cubeLength !== 2 ? -2 : 0
     const positionOffset = (cubeLength - 1) / 2
     const delta = (cubeLength + spacing)
@@ -95,11 +97,35 @@ function App() {
 
     const handleFinishCube = () => {
         setIsRunning(false)
+        let timeTableShadow = [...timeTable]
+        timeTableShadow.push([time, count])
+        setTimeTable(timeTableShadow)
+        setIsFinish(true)
+    }
+
+    const handleScrambleCube = () => {
+        setCubes([])
+        setIsRunning(false)
+        setTime(0)
+        setCount(0)
+    }
+
+    const handleRestart = () => {
+        setIsFinish(false)
+        handleScrambleCube()
+    }
+
+    const handleCubeLength = (e) => {
+        let cubeL = parseInt(e.currentTarget.dataset.cube)
+        if(cubeL !== cubeLength) {
+            setCubeLength(cubeL)
+            handleScrambleCube()
+        }
     }
 
     // R2 U2 R2 U R2 U R F2 U' U' L U' R' U R U' L U2 L' U2 R' U2 R U R' U R U' R2 L2 U' D
     // L U' U U' L L' U2 R' U2 U R' U U' R2 D
-    // U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R' U' L F' B R L U2 L2 U L U' L' U L R U R2 U' R D2 L' U L U2 L' U' L D U F U F' U L' U' L R U R' U R' F R F' U2 R' F R F' U2 L U2 L' U2 L F' L' U' L U L F L2
+    // U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R'
     // solve U' L F' B R L U2 L2 U L U' L' U L R U R2 U' R D2 L' U L U2 L' U' L D U F U F' U L' U' L R U R' U R' F R F' U2 R' F R F' U2 L U2 L' U2 L F' L' U' L U L F L
     return (
         <div className="App">
@@ -108,7 +134,7 @@ function App() {
                     <RubikCube
                         cubes={cubes}
                         addTurn={(val) => setCount(val)}
-                        scramble={"L"}
+                        scramble={cubeLength === 3?"U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R'":"U F' U F' R F U' F' R'"}
                         maxPosition={maxPosition}
                         delta={delta}
                         cubeLength={cubeLength}
@@ -120,13 +146,30 @@ function App() {
             <div className="menu">
                 <ul className="menu__list">
                     <li><button className="menu__button--solve" onClick={handleReset}>Solve</button></li>
-                    <li><button className="menu__button--scramble">Scramble</button></li>
+                    <li><button className="menu__button--scramble" onClick={handleScrambleCube}>Scramble</button></li>
                 </ul>
             </div>
-                <div className="header">
-                    <h1 className="header__heading-1"><strong>Rubik's Cube</strong> Challenge</h1>
-                    <button className="header__button">3x3x3</button>
+            <div className="header">
+                <h1 className="header__heading-1"><strong>Rubik's Cube</strong> Challenge</h1>
+                <div className="header__container-button">
+                    <button className="header__button" onClick={handleCubeLength} data-cube={2}>2x2x2</button>
+                    <button className="header__button" onClick={handleCubeLength} data-cube={3}>3x3x3</button>
                 </div>
+            </div>
+            <div className={`end-screen${isFinish?'--active':''}`}>
+                <div className="end-screen__container">
+                    <div className="end-screen__time">
+                        <h2 className="end-screen__heading-2">{handleCount()}</h2>
+                        <div className="end-screen__counter">
+                            <span className="end-screen__counter-title">Nombre de mouvements :</span>
+                            <span className="end-screen__counter-num">{count}</span>
+                        </div>
+                        <div className="end-screen__retry">
+                            <button className="end-screen__retry-button" onClick={handleRestart}>Recommencer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div className="footer">
                 <div className="footer__start">
                     {

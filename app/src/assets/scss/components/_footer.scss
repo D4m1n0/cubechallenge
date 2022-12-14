@@ -6,6 +6,9 @@
   display: flex;
   align-items: center;
   flex-direction: column;
+  border-top: 1px solid rgba(163, 163, 163, 0.30);
+  box-sizing: border-box;
+  padding-top: 20px;
   &__start {
     margin-bottom: 20px;
     &-button {
@@ -13,8 +16,7 @@
       font-weight: 500;
       color: black;
       background-color: white;
-      width: 183px;
-      height: 50px;
+      padding: 12px 24px;
       border-radius: 46px;
       cursor: pointer;
     }

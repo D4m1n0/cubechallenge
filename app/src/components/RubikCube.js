@@ -21,7 +21,7 @@ const move = {
     ]
 }
 const originalCube = [ ["L", "R"], ["D", "U"], ["B", "F"] ]
-const speedScramble = 1
+const speedScramble = 100
 const cameraByCubeLength = {"2": {x: -6, y: 6, z: 10}, "3": {x: -4, y: 4, z: 7}, "4": {x: -11, y: 11, z: 18}, "5": {x: -19, y: 19, z: 32}, "6": {x: -29, y: 29, z: 49}, "7": {x: -42, y: 42, z: 70}}
 
 const RubikCube = (props) => {

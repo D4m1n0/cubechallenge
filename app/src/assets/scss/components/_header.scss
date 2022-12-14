@@ -6,11 +6,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-bottom: 1px solid rgba(163, 163, 163, 0.30);
+  box-sizing: border-box;
+  padding-bottom: 20px;
   &__heading-1 {
     font-size: 36px;
     font-weight: 300;
     margin-bottom: 20px;
     margin-top: 0;
+  }
+  &__container-button {
+    display: flex;
+    gap: 10px;
   }
   &__button {
     appearance: none;
