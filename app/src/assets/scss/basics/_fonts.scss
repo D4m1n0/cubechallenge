@@ -1,0 +1,3 @@
+@each $font-face in map-keys($font-face-include) {
+  @include font-face($font, $font + "-" + $font-face, map-get($font-face-include, $font-face), "normal");
+}

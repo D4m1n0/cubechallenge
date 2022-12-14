@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import {useRef, useEffect} from "react";
+import {useRef, useEffect, useState} from "react";
 import {Interaction} from "../../node_modules/three.interaction/src/index";
 import {TrackballControls} from "three/examples/jsm/controls/experimental/CameraControls";
 
@@ -27,7 +27,7 @@ const cameraByCubeLength = {"2": {x: -6, y: 6, z: 10}, "3": {x: -4, y: 4, z: 7},
 const RubikCube = (props) => {
     const mount = useRef(null)
     const controls = useRef(null)
-    const {cubes, scramble, addTurn, startTimer, maxPosition, delta, cubeLength} = props
+    const {cubes, scramble, addTurn, maxPosition, delta, cubeLength, handleFinishCube, startTimer} = props
 
     const getCubesFromMovement = (movement) => {
         let cubesToMove = [];
@@ -253,19 +253,32 @@ const RubikCube = (props) => {
                 }
             }
         }
-        if(wrongCubes === 0) {
-            console.log("3x3 or 2x2 is correct")
-        }
-        if(cubeLength > 3) {
-            if(centerAtGoodPlace === nCenter) {
-                if(cubeLength%2 !== 0) {
-                    console.log("odd cube centers are correct")
-                } else {
-                    if(checkAxisCenter === 3) {
-                        console.log("even cube centers are correct")
-                    }
-                }
+        // if(wrongCubes === 0) {
+        //     console.log("3x3 or 2x2 is correct")
+        // }
+        // if(cubeLength > 3) {
+        //     if(centerAtGoodPlace === nCenter) {
+        //         if(cubeLength%2 !== 0) {
+        //             console.log("odd cube centers are correct")
+        //         } else {
+        //             if(checkAxisCenter === 3) {
+        //                 console.log("even cube centers are correct")
+        //             }
+        //         }
+        //     }
+        // }
+        if(cubeLength <= 3 && wrongCubes === 0) {
+            return 1
+        } else if(cubeLength > 3 && wrongCubes === 0 && centerAtGoodPlace === nCenter) {
+            if(cubeLength%2 !== 0) {
+                return 1
+            } else if(checkAxisCenter === 3) {
+                return 1
+            } else {
+                return 0
             }
+        } else {
+            return 0
         }
         // console.log(centerAtGoodPlace, nCenter, checkAxisCenter, wrongCubes)
         // console.log(evenCenter, originalCube)
@@ -307,13 +320,11 @@ const RubikCube = (props) => {
                 cubeMovement[i][0].update(movement, axisOfRotation)
             }
         }
-        checkFinishedCube()
-        // let locationCheck = 0
-        //
-        // if(locationCheck === 21) {
-        //     console.log("CUBE end")
-        //     startTimer(false)
-        // }
+
+        if(checkFinishedCube()) {
+            handleFinishCube()
+        }
+
         return 1
     }
 
@@ -376,7 +387,7 @@ const RubikCube = (props) => {
                 positionSave = undefined
 
                 if(count === 0) {
-                    // startTimer(true)
+                    startTimer()
                 }
 
                 count += 1

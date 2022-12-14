@@ -1,0 +1,13 @@
+$font: 'GT-America';
+$font-family-base: $font;
+
+$font-face-include: () !default;
+$font-face-include: map-merge(
+                (
+                        "Light": 300,
+                        "Regular": 400,
+                        "Medium": 500,
+                        "Bold": 700
+                ),
+                $font-face-include
+);

@@ -1,4 +1,4 @@
-import './App.css';
+import './assets/scss/main.scss';
 import {useEffect, useState} from "react";
 import Cube from "./components/Cube";
 import RubikCube from "./components/RubikCube";
@@ -8,7 +8,7 @@ function App() {
     const [cubes, setCubes] = useState([])
     const [count, setCount] = useState(0)
     const [isRunning, setIsRunning] = useState(false)
-    const [time, setTime] = useState(false)
+    const [time, setTime] = useState(0)
     const cubeLength = 3
     const spacing = cubeLength !== 2 ? -2 : 0
     const positionOffset = (cubeLength - 1) / 2
@@ -44,7 +44,7 @@ function App() {
                     if(Math.max(Math.abs(x), Math.abs(y)) === maxPosition || Math.max(Math.abs(y), Math.abs(z)) === maxPosition) {
                         cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
                         cube[index].setSize(delta)
-                        // cube[index].addText = true
+                        cube[index].addText = true
                         // cube[index].setVisible(false)
                     } else {
                         cube[index] = null
@@ -78,6 +78,25 @@ function App() {
         );
     };
 
+    const handleReset = () => {
+        for (let i = 0; i < cubes.length; i++) {
+            cubes[i].reset()
+        }
+        setIsRunning(false)
+        setTime(0)
+        setCount(0)
+    }
+
+    const startTimer = () => {
+        setTime(0)
+        setCount(0)
+        setIsRunning(true)
+    }
+
+    const handleFinishCube = () => {
+        setIsRunning(false)
+    }
+
     // R2 U2 R2 U R2 U R F2 U' U' L U' R' U R U' L U2 L' U2 R' U2 R U R' U R U' R2 L2 U' D
     // L U' U U' L L' U2 R' U2 U R' U U' R2 D
     // U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R' U' L F' B R L U2 L2 U L U' L' U L R U R2 U' R D2 L' U L U2 L' U' L D U F U F' U L' U' L R U R' U R' F R F' U2 R' F R F' U2 L U2 L' U2 L F' L' U' L U L F L2
@@ -87,19 +106,40 @@ function App() {
             {
                 cubes.length !== 0 ? (
                     <RubikCube
-                        startTimer={(type) => { setIsRunning(type)} }
                         cubes={cubes}
                         addTurn={(val) => setCount(val)}
                         scramble={"L"}
                         maxPosition={maxPosition}
                         delta={delta}
                         cubeLength={cubeLength}
+                        startTimer={startTimer}
+                        handleFinishCube={handleFinishCube}
                     />
                 ) : ""
             }
-            <div className="turn">Nombre de mouvements : {count}</div>
-            <div className="timer">
-                <span className="timer__title">{handleCount()}</span>
+            <div className="menu">
+                <ul className="menu__list">
+                    <li><button className="menu__button--solve" onClick={handleReset}>Solve</button></li>
+                    <li><button className="menu__button--scramble">Scramble</button></li>
+                </ul>
+            </div>
+                <div className="header">
+                    <h1 className="header__heading-1"><strong>Rubik's Cube</strong> Challenge</h1>
+                    <button className="header__button">3x3x3</button>
+                </div>
+            <div className="footer">
+                <div className="footer__start">
+                    {
+                        !isRunning && (<button className="footer__start-button" onClick={startTimer}>Start</button>)
+                    }
+                </div>
+                <div className="footer__timer">
+                    <span className="footer__timer-title">{handleCount()}</span>
+                </div>
+                <div className="footer__counter">
+                    <span className="footer__counter-title">Nombre de mouvements :</span>
+                    <span className="footer__counter-num">{count}</span>
+                </div>
             </div>
         </div>
     )

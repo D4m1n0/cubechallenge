@@ -1,0 +1,50 @@
+.menu {
+  position: absolute;
+  top: 31px;
+  left: 31px;
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 12px;
+  }
+  &__button {
+    appearance: none;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    background: none;
+    color: white;
+    font-size: 11px;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    &:before {
+      content: '';
+      display: block;
+      width: 40px;
+      aspect-ratio: 1;
+      border-radius: 100%;
+      background-color: white;
+      background-repeat: no-repeat;
+      background-size: 26px;
+      background-position: center;
+    }
+    &--solve {
+      @extend .menu__button;
+      &:before {
+        background-image: url("./../../img/solve.png");
+      }
+    }
+    &--scramble {
+      @extend .menu__button;
+      &:before {
+        background-image: url("./../../img/scramble.png");
+      }
+    }
+  }
+}

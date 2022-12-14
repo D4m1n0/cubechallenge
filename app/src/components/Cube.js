@@ -169,6 +169,19 @@ class Cube {
         this.rotateOnAxis(axis, angle)
         this.translateCube(angle, axis)
     }
+
+    reset() {
+        if(this.num === 6) {
+            console.log(this.cube.position)
+        }
+        this.position = this.originalPosition
+        this.rotation = {x: 0, y: 0, z: 0}
+        this.cube.rotation.set(0, 0, 0)
+        this.cube.position.set(this.originalPosition.x, this.originalPosition.y, this.originalPosition.z)
+        if(this.num === 6) {
+            console.log(this.cube.position)
+        }
+    }
     getLayer(cubePosition, maxPosition) {
         const layers = [["L", "R"], ["D", "U"], ["B", "F"]]
         let layerIndex = cubePosition.findIndex((el) => Math.abs(el) === maxPosition)

@@ -1,0 +1,52 @@
+.footer {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  &__start {
+    margin-bottom: 20px;
+    &-button {
+      font-size: 26px;
+      font-weight: 500;
+      color: black;
+      background-color: white;
+      width: 183px;
+      height: 50px;
+      border-radius: 46px;
+      cursor: pointer;
+    }
+  }
+  &__counter {
+    display: flex;
+    align-items: center;
+    &-title {
+      font-size: 22px;
+      font-weight: 300;
+    }
+    &-num {
+      font-size: 16px;
+      font-weight: 500;
+      color: black;
+      background-color: white;
+      display: flex;
+      width: 41px;
+      aspect-ratio: 1;
+      border-radius: 100%;
+      justify-content: center;
+      align-items: center;
+      margin-left: 12px;
+    }
+  }
+  &__timer {
+    margin-bottom: 20px;
+    &-title {
+      font-size: 60px;
+      font-weight: 500;
+      display: block;
+      width: 200px;
+    }
+  }
+}
