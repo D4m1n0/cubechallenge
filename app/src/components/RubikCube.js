@@ -21,6 +21,8 @@ const move = {
     ]
 }
 const originalCube = [ ["L", "R"], ["D", "U"], ["B", "F"] ]
+const speedScramble = 1
+const cameraByCubeLength = {"2": {x: -6, y: 6, z: 10}, "3": {x: -4, y: 4, z: 7}, "4": {x: -11, y: 11, z: 18}, "5": {x: -19, y: 19, z: 32}, "6": {x: -29, y: 29, z: 49}, "7": {x: -42, y: 42, z: 70}}
 
 const RubikCube = (props) => {
     const mount = useRef(null)
@@ -38,7 +40,6 @@ const RubikCube = (props) => {
             axe = movement[1]
         }else {
             // Movement made by scramble
-            // console.log(maxPosition, delta)
             switch (movement) {
                 case "F":
                 case "F'":  face = maxPosition;   axe = "z"; break;
@@ -136,7 +137,6 @@ const RubikCube = (props) => {
                 // default: console.log("same"); break;
             }
         }
-
         return movement
     }
 
@@ -144,7 +144,6 @@ const RubikCube = (props) => {
         let double = movements[index].indexOf("2") > -1 ? 1 : 0
         let movement = double ? movements[index].replace("2", "") : movements[index]
         movements[index] = movement
-        // console.log("move", movement)
 
         if(double) {
             movements.splice(index, 0, movement)
@@ -159,16 +158,7 @@ const RubikCube = (props) => {
             index += 1
             setTimeout(() => {
                 setScramble(movements, index)
-            }, 1)
-        } else {
-            // cubes[0].getMaterials()
-            // console.log(cubes[17].cube)
-            // cubes[17].getOrientation()
-            // console.log(cubes[14].cube.position)
-            // cubes[17].getWDirection()
-            // cubes[17].getOrientation()
-            // cubes[8].getWDirection()
-            // cubes[8].getOrientation()
+            }, speedScramble)
         }
     }
 
@@ -197,8 +187,10 @@ const RubikCube = (props) => {
         // If odd cube, get center element at position {x: 0, y: 0, z: 1}
         if(cubeLength !== 2 && cubeLength%2 !== 0) {
             cube = cubes.filter((obj) => obj.originalPosition.x === 0 && obj.originalPosition.y === 0 && obj.originalPosition.z === maxPosition ? obj : '')[0]
-        } else {
+        } else if(cubeLength !== 2 && cubeLength%2 === 0) {
             cube = cubes.filter((obj) => obj.type === "center")[0]
+        } else {
+            cube = cubes[2]
         }
 
         const cubeIndicator = {x: cube.cube.position.x, y: cube.cube.position.y, z: cube.cube.position.z}
@@ -209,7 +201,7 @@ const RubikCube = (props) => {
         for (let i = 0; i < cubes.length; i++) {
             let cubeWorldDirection = cubes[i].getWDirection()
             if(cubes[i].type === "center") {
-                // console.log(cubeWorldDirection[0], cubeWorldDirection[1], cubes[i])
+                // setup checks for centers
                 const cubePosition = cubes[i].position
                 const cubeMaxPosition = Object.keys(cubePosition).filter((a) => Math.abs(cubePosition[a]) === maxPosition ? a : "")[0]
                 const cubeSignPosition = Math.sign(cubePosition[cubeMaxPosition]) === -1 ? 0 : 1
@@ -219,9 +211,9 @@ const RubikCube = (props) => {
                 centerArray[cubeMaxPositionNumber][cubeSignPosition].push(cubes[i])
             } else {
                 if(cubeWorldDirection[1][maxKey] === 1) {
-                    // console.log(cubeWorldDirection[0], cubeWorldDirection[1], "cube ok")
+                    // cube ok
                 } else {
-                    // console.log(cubeWorldDirection[0], cubes[i].type, cubeWorldDirection[1], "cube wrong")
+                    // cube wrong
                     wrongCubes++
                 }
             }
@@ -262,7 +254,7 @@ const RubikCube = (props) => {
             }
         }
         if(wrongCubes === 0) {
-            console.log("3x3 is correct")
+            console.log("3x3 or 2x2 is correct")
         }
         if(cubeLength > 3) {
             if(centerAtGoodPlace === nCenter) {
@@ -331,21 +323,26 @@ const RubikCube = (props) => {
         let frameId
 
         const scene = new THREE.Scene()
-        const axesHelper = new THREE.AxesHelper( 20 );
+        // const axesHelper = new THREE.AxesHelper( 20 );
         // scene.add( axesHelper );
-        const size = 10;
-        const divisions = 10;
+        // const size = 10;
+        // const divisions = 10;
 
-        const gridHelper = new THREE.GridHelper( size, divisions );
-        scene.add( gridHelper );
+        // const gridHelper = new THREE.GridHelper( size, divisions );
+        // scene.add( gridHelper );
 
-        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-        camera.position.z = 15
+        const camera = new THREE.PerspectiveCamera(75, width / height, 1, 1000)
+        camera.position.x = cameraByCubeLength[cubeLength].x
+        camera.position.y = cameraByCubeLength[cubeLength].y
+        camera.position.z = cameraByCubeLength[cubeLength].z
 
         const renderer = new THREE.WebGLRenderer({ antialias: true })
         const interaction = new Interaction(renderer, scene, camera)
 
         const controls = new TrackballControls(camera, renderer.domElement)
+        // controls.addEventListener("change", () => {
+        //     console.log(camera.position)
+        // })
         controls.enablePan = false
 
         let group = new THREE.Object3D()
@@ -429,7 +426,7 @@ const RubikCube = (props) => {
         window.addEventListener('pointermove', pointerMoveEvent)
         group.on("pointerout", pointerOutEvent)
 
-        renderer.setClearColor('#9f9f9f')
+        renderer.setClearColor('#262626')
         renderer.setSize(width, height)
 
         const renderScene = () => {

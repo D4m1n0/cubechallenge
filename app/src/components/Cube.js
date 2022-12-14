@@ -33,6 +33,7 @@ class Cube {
         this.originalColor = 0
         this.originalLayer = ""
         this.rotation = rotation
+        this.addText = false
     }
     faceColor(color, i) {
         let canvas = document.createElement('canvas');
@@ -43,16 +44,19 @@ class Cube {
         ctx.rect(0,0,128,128);
         ctx.fillStyle = color;
         ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 10
         ctx.fill();
         ctx.stroke();
         ctx.closePath();
 
-        ctx.beginPath();
-        ctx.font = "60px Arial";
-        ctx.fillStyle = "black";
-        ctx.textAlign = "center";
-        ctx.fillText(this.num, canvas.width / 2, (canvas.height / 2) + 20);
-        ctx.closePath();
+        if(this.addText) {
+            ctx.beginPath();
+            ctx.font = "60px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText(this.num, canvas.width / 2, (canvas.height / 2) + 20);
+            ctx.closePath();
+        }
 
         let image = new Image();
         image.src = canvas.toDataURL();
@@ -87,24 +91,18 @@ class Cube {
     }
     rotateOnAxis(axisString, angle) {
         let axis = this.determinateAxisViaMovement(axisString)
-        // if(this.n === 0) {
-        //     console.log("THIS2", this.cube.getWorldDirection(new THREE.Vector3(0, 0, 0)), this.cube.position)
-        // }
         this.cube.rotateOnWorldAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
-        // this.cube.rotateOnAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
-        // this.cube.rotation.set(axis.x, axis.y, axis.z)
-        // this.cube.setRotationFromAxisAngle(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
         this.rotation.x = this.cube.rotation.x
         this.rotation.y = this.cube.rotation.y
         this.rotation.z = this.cube.rotation.z
         if(this.num === 0) {
-            let quat = new THREE.Quaternion()
-            const worldQuaternion = this.cube.getWorldQuaternion(quat)
-            const eulerQuaternion = new THREE.Euler()
-            const test = eulerQuaternion.setFromQuaternion(worldQuaternion)
-            let eulerX = Math.round(test.x * 10000) / 10000
-            let eulerY = Math.round(test.y * 10000) / 10000
-            let eulerZ = Math.round(test.z * 10000) / 10000
+            // let quat = new THREE.Quaternion()
+            // const worldQuaternion = this.cube.getWorldQuaternion(quat)
+            // const eulerQuaternion = new THREE.Euler()
+            // const test = eulerQuaternion.setFromQuaternion(worldQuaternion)
+            // let eulerX = Math.round(test.x * 10000) / 10000
+            // let eulerY = Math.round(test.y * 10000) / 10000
+            // let eulerZ = Math.round(test.z * 10000) / 10000
             // const worldRotation = worldQuaternion.toEulerAngles()
             // console.log("THIS", this.cube.getWorldDirection(new THREE.Vector3(0, 0, 0)), this.cube.position)
             // Get orientation
@@ -197,8 +195,6 @@ class Cube {
                 this.type = "center"
                 this.subtype = "center-stoic"
             } else {
-                // this.originalLayer = this.getLayer(calculatedTypeArray, maxPosition)
-
                 if(calculatedTypeArray.filter(x => x===0).length === 1) {
                     this.type = "center"
                     this.subtype = "center-edge"
