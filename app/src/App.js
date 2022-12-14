@@ -46,7 +46,7 @@ function App() {
                     if(Math.max(Math.abs(x), Math.abs(y)) === maxPosition || Math.max(Math.abs(y), Math.abs(z)) === maxPosition) {
                         cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
                         cube[index].setSize(delta)
-                        cube[index].addText = true
+                        // cube[index].addText = true
                         // cube[index].setVisible(false)
                     } else {
                         cube[index] = null
