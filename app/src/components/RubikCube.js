@@ -2,6 +2,7 @@ import * as THREE from "three";
 import {useRef, useEffect, useState} from "react";
 import {Interaction} from "../../node_modules/three.interaction/src/index";
 import {TrackballControls} from "three/examples/jsm/controls/experimental/CameraControls";
+import {TweenMax} from "gsap";
 
 const move = {
     "x": [
@@ -21,7 +22,7 @@ const move = {
     ]
 }
 const originalCube = [ ["L", "R"], ["D", "U"], ["B", "F"] ]
-const speedScramble = 1
+const speedScramble = 500
 const cameraByCubeLength = {"2": {x: -6, y: 6, z: 10}, "3": {x: -4, y: 4, z: 7}, "4": {x: -11, y: 11, z: 18}, "5": {x: -19, y: 19, z: 32}, "6": {x: -29, y: 29, z: 49}, "7": {x: -42, y: 42, z: 70}}
 
 const RubikCube = (props) => {
@@ -140,7 +141,7 @@ const RubikCube = (props) => {
         return movement
     }
 
-    const setScramble = (movements, index) => {
+    const setScramble = (movements, index, scene) => {
         let double = movements[index].indexOf("2") > -1 ? 1 : 0
         let movement = double ? movements[index].replace("2", "") : movements[index]
         movements[index] = movement
@@ -150,15 +151,28 @@ const RubikCube = (props) => {
         }
 
         let cubesToMove = getCubesFromMovement(movement)
+        let group = new THREE.Object3D()
+        scene.add(group)
+        let directionAnim = Math.sign(cubesToMove[0][0].getAngle(movement))
         for (let i = 0; i < cubesToMove.length; i++) {
+            let cube = cubesToMove[i][0].cube.clone()
+            group.add(cube)
+            cubesToMove[i][0].setVisible(false)
             cubesToMove[i][0].update(movement, cubesToMove[i][1])
         }
+        directionAnim = [cubesToMove[0][1]] === "y" ? directionAnim * -1 : directionAnim
+        TweenMax.to(group.rotation, speedScramble/1000, {[cubesToMove[0][1]]: (Math.PI/2)*directionAnim, onComplete: () => {
+                    for (let i = 0; i < cubesToMove.length; i++) {
+                        cubesToMove[i][0].setVisible(true)
+                        scene.remove(group)
+                    }
+                }})
 
         if(index < movements.length-1) {
             index += 1
             setTimeout(() => {
-                setScramble(movements, index)
-            }, speedScramble)
+                setScramble(movements, index, scene)
+            }, speedScramble + 100)
         }
     }
 
@@ -284,7 +298,7 @@ const RubikCube = (props) => {
         // console.log(evenCenter, originalCube)
     }
 
-    const moveLayer = (p1, p2, faceOnClick) => {
+    const moveLayer = (p1, p2, faceOnClick, scene) => {
         let pos1 = removePoint(p1, faceOnClick[0])
         let pos2 = removePoint(p2, faceOnClick[0])
         let directionOfRotation, axisOfRotation, direction, layer;
@@ -317,21 +331,29 @@ const RubikCube = (props) => {
             if(directionOfRotation === "y" && axisOfRotation === "z") { direction = (-direction)+1 }
             let movement = getComplicatedMovement(axisOfRotation, layer, direction)
             let cubeMovement = getCubesFromMovement([layer, axisOfRotation])
-            // créer un group
+
+            let group = new THREE.Object3D()
+            scene.add(group)
             for (let i = 0; i < cubeMovement.length; i++) {
-                // duplicate cubes
-                // set visible false original cube
-                // update original cube
-                // group duplicate cube
+                let cube = cubeMovement[i][0].cube.clone()
+                group.add(cube)
+                cubeMovement[i][0].setVisible(false)
                 cubeMovement[i][0].update(movement, axisOfRotation)
             }
-            // rotate group
-            // remove group
-            // set visible true original cube
+            let directionAnim = direction !== 0 ? -1 : 1
+            directionAnim = axisOfRotation === "y" ? directionAnim * -1 : directionAnim
+            TweenMax.to(group.rotation, speedScramble/1000, {[axisOfRotation]: (Math.PI/2)*directionAnim, onComplete: () => {
+                    for (let i = 0; i < cubeMovement.length; i++) {
+                        cubeMovement[i][0].setVisible(true)
+                        scene.remove(group)
+                    }
+                }})
         }
 
         if(checkFinishedCube()) {
-            handleFinishCube()
+            setTimeout(() => {
+                handleFinishCube()
+            }, 500)
         }
 
         return 1
@@ -374,7 +396,7 @@ const RubikCube = (props) => {
         group.name = "rubik"
 
         let movements = scramble.split(" ");
-        setScramble(movements, 0)
+        setScramble(movements, 0, scene)
 
         const mouse = new THREE.Vector2()
         const raycaster = new THREE.Raycaster()
@@ -388,7 +410,7 @@ const RubikCube = (props) => {
             mouse.y = - (e.clientY / height) * 2 + 1
         }
         const mouseUpOutEvent = () => {
-            let move = moveLayer(position1, position2, faceOnClick)
+            let move = moveLayer(position1, position2, faceOnClick, scene)
             if(move) {
                 position1 = undefined
                 position2 = undefined

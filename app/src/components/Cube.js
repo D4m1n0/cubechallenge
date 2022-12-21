@@ -162,14 +162,16 @@ class Cube {
     getWDirection() {
         return [this.num, this.worldDirection]
     }
-
-    update(movement, axis) {
+    getAngle(movement) {
         let reverse = 0
         if (movement.indexOf("'") > -1) {
             reverse = 1
             movement = movement.replace("'", "")
         }
-        let angle = reverse ? -MOVEMENTS[movement] : MOVEMENTS[movement]
+        return reverse ? -MOVEMENTS[movement] : MOVEMENTS[movement]
+    }
+    update(movement, axis) {
+        let angle = this.getAngle(movement)
 
         this.rotateOnAxis(axis, angle)
         this.translateCube(angle, axis)
@@ -236,7 +238,8 @@ class Cube {
     }
 
     setVisible(visible = true) {
-        this.visible = visible
+        // console.log(visible)
+        this.cube.visible = visible
     }
 
     setLookAt(obj) {
