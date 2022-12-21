@@ -21,7 +21,7 @@ const move = {
     ]
 }
 const originalCube = [ ["L", "R"], ["D", "U"], ["B", "F"] ]
-const speedScramble = 100
+const speedScramble = 1
 const cameraByCubeLength = {"2": {x: -6, y: 6, z: 10}, "3": {x: -4, y: 4, z: 7}, "4": {x: -11, y: 11, z: 18}, "5": {x: -19, y: 19, z: 32}, "6": {x: -29, y: 29, z: 49}, "7": {x: -42, y: 42, z: 70}}
 
 const RubikCube = (props) => {
@@ -311,14 +311,23 @@ const RubikCube = (props) => {
             } else {
                 direction = p1[directionOfRotation] < p2[directionOfRotation] ? 0 : 1
             }
+
             if(directionOfRotation === "z" && axisOfRotation === "x") { direction = (-direction)+1 }
             if(directionOfRotation === "z" && axisOfRotation === "y") { direction = (-direction)+1 }
             if(directionOfRotation === "y" && axisOfRotation === "z") { direction = (-direction)+1 }
             let movement = getComplicatedMovement(axisOfRotation, layer, direction)
             let cubeMovement = getCubesFromMovement([layer, axisOfRotation])
+            // créer un group
             for (let i = 0; i < cubeMovement.length; i++) {
+                // duplicate cubes
+                // set visible false original cube
+                // update original cube
+                // group duplicate cube
                 cubeMovement[i][0].update(movement, axisOfRotation)
             }
+            // rotate group
+            // remove group
+            // set visible true original cube
         }
 
         if(checkFinishedCube()) {
@@ -332,6 +341,7 @@ const RubikCube = (props) => {
         let width = mount.current.clientWidth
         let height = mount.current.clientHeight
         let frameId
+        let count = 0
 
         const scene = new THREE.Scene()
         // const axesHelper = new THREE.AxesHelper( 20 );
@@ -371,14 +381,12 @@ const RubikCube = (props) => {
 
         let faceOnClick = []
         let position1, position2, positionSave
+        let down = false
 
         const mousePosition = (e) => {
             mouse.x = (e.clientX / width) * 2 - 1
             mouse.y = - (e.clientY / height) * 2 + 1
-            raycaster.setFromCamera( mouse, camera )
         }
-
-        let count = 0
         const mouseUpOutEvent = () => {
             let move = moveLayer(position1, position2, faceOnClick)
             if(move) {
@@ -395,15 +403,11 @@ const RubikCube = (props) => {
             }
         }
 
-        const pointerOutEvent = (e) => {
+        const pointerOutEvent = () => {
             if(position1 !== undefined && position2 === undefined) {
                 position2 = positionSave
                 mouseUpOutEvent()
             }
-
-            setTimeout(() => {
-                controls.enableRotate = true
-            }, 500)
         }
 
         const pointerMoveEvent = (e) => {
@@ -417,31 +421,38 @@ const RubikCube = (props) => {
         }
 
         const mouseEvent = (e) => {
-            mousePosition(e)
+            raycaster.setFromCamera( mouse, camera )
             const intersects = raycaster.intersectObjects( group.children );
             if(intersects.length > 0) {
-                if(e.type === "mousedown") {
+                if(e.type === "pointerdown") {
                     faceOnClick = determinationFaceOnClick(intersects[0].point)
                     position1 = intersects[0].object.position
                 }
-                if(e.type === "mouseup") {
+                if(e.type === "pointerup") {
                     position2 = intersects[0].object.position
                     mouseUpOutEvent()
                 }
-                controls.enableRotate = !controls.enableRotate
+                controls.enableRotate = down
             }
         }
-
-        window.addEventListener('mousedown', mouseEvent)
-        window.addEventListener('mouseup', mouseEvent)
-        window.addEventListener('pointermove', pointerMoveEvent)
+        let canvas = document.querySelector("body")
+        canvas.addEventListener('pointerdown', (e) => {
+            mousePosition(e)
+            mouseEvent(e)
+            down = true
+        })
+        canvas.addEventListener('pointerup', (e) => {
+            mouseEvent(e)
+            down = false
+        })
+        canvas.addEventListener('pointermove', pointerMoveEvent)
         group.on("pointerout", pointerOutEvent)
 
         renderer.setClearColor('#262626')
         renderer.setSize(width, height)
 
         const renderScene = () => {
-            raycaster.setFromCamera( mouse, camera )
+            // raycaster.setFromCamera( mouse, camera )
             renderer.render(scene, camera)
         }
 

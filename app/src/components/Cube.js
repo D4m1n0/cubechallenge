@@ -10,15 +10,15 @@ const colors = [
     "#3D81F6"  // z = -1
 ]
 const MOVEMENTS = {
-    "R": -(Math.PI/2), "r": -(Math.PI/2), "3r": -(Math.PI/2), "Rw": -(Math.PI/2),
-    "L": Math.PI/2, "l": Math.PI/2, "3l": Math.PI/2, "Lw": Math.PI/2,
-    "U": -(Math.PI/2), "u": -(Math.PI/2), "3u": -(Math.PI/2), "Uw": -(Math.PI/2),
-    "D": Math.PI/2, "d": Math.PI/2, "3d": Math.PI/2, "Dw": Math.PI/2,
-    "F": -(Math.PI/2), "f": -(Math.PI/2), "3f": -(Math.PI/2), "Fw": -(Math.PI/2),
-    "B": Math.PI/2, "b": Math.PI/2, "3b": Math.PI/2, "Bw": Math.PI/2,
-    "M": Math.PI/2,
-    "E": Math.PI/2,
-    "S": -(Math.PI/2),
+    "R": -(Math.PI / 2), "r": -(Math.PI / 2), "3r": -(Math.PI / 2), "Rw": -(Math.PI / 2),
+    "L": Math.PI / 2, "l": Math.PI / 2, "3l": Math.PI / 2, "Lw": Math.PI / 2,
+    "U": -(Math.PI / 2), "u": -(Math.PI / 2), "3u": -(Math.PI / 2), "Uw": -(Math.PI / 2),
+    "D": Math.PI / 2, "d": Math.PI / 2, "3d": Math.PI / 2, "Dw": Math.PI / 2,
+    "F": -(Math.PI / 2), "f": -(Math.PI / 2), "3f": -(Math.PI / 2), "Fw": -(Math.PI / 2),
+    "B": Math.PI / 2, "b": Math.PI / 2, "3b": Math.PI / 2, "Bw": Math.PI / 2,
+    "M": Math.PI / 2,
+    "E": Math.PI / 2,
+    "S": -(Math.PI / 2),
 }
 
 class Cube {
@@ -35,13 +35,14 @@ class Cube {
         this.rotation = rotation
         this.addText = false
     }
+
     faceColor(color, i) {
         let canvas = document.createElement('canvas');
         canvas.width = 128;
         canvas.height = 128;
         let ctx = canvas.getContext('2d');
         ctx.beginPath();
-        ctx.rect(0,0,128,128);
+        ctx.rect(0, 0, 128, 128);
         ctx.fillStyle = color;
         ctx.strokeStyle = "#000000";
         ctx.lineWidth = 10
@@ -49,7 +50,7 @@ class Cube {
         ctx.stroke();
         ctx.closePath();
 
-        if(this.addText) {
+        if (this.addText) {
             ctx.beginPath();
             ctx.font = "60px Arial";
             ctx.fillStyle = "black";
@@ -68,34 +69,49 @@ class Cube {
 
         return texture;
     }
-    face () {
+
+    face() {
         let materials = []
         for (let i = 0; i < 6; i++) {
             materials.push(new THREE.MeshBasicMaterial({map: this.faceColor(colors[i], i)}))
             switch (i) {
-                case 0: materials[i].name = "red"; break;
-                case 1: materials[i].name = "orange"; break;
-                case 2: materials[i].name = "white"; break;
-                case 3: materials[i].name = "yellow"; break;
-                case 4: materials[i].name = "green"; break;
-                default: materials[i].name = "blue"; break;
+                case 0:
+                    materials[i].name = "red";
+                    break;
+                case 1:
+                    materials[i].name = "orange";
+                    break;
+                case 2:
+                    materials[i].name = "white";
+                    break;
+                case 3:
+                    materials[i].name = "yellow";
+                    break;
+                case 4:
+                    materials[i].name = "green";
+                    break;
+                default:
+                    materials[i].name = "blue";
+                    break;
             }
         }
         return materials
     }
+
     determinateAxisViaMovement(a) {
         let axis = {x: 0, y: 0, z: 0};
         axis[a] = 1;
 
         return axis
     }
+
     rotateOnAxis(axisString, angle) {
         let axis = this.determinateAxisViaMovement(axisString)
         this.cube.rotateOnWorldAxis(new THREE.Vector3(axis.x, axis.y, axis.z), angle)
         this.rotation.x = this.cube.rotation.x
         this.rotation.y = this.cube.rotation.y
         this.rotation.z = this.cube.rotation.z
-        if(this.num === 0) {
+        if (this.num === 0) {
             // let quat = new THREE.Quaternion()
             // const worldQuaternion = this.cube.getWorldQuaternion(quat)
             // const eulerQuaternion = new THREE.Euler()
@@ -111,9 +127,10 @@ class Cube {
             // console.log(this.cube.localToWorld(new THREE.Vector3()))
         }
     }
+
     translateCube(angle, axis) {
         let x, y, z = 0;
-        if(axis === "y") {
+        if (axis === "y") {
             x = this.position.x * Math.round(Math.cos(angle)) - this.position.z * Math.sin(angle)
             z = this.position.x * Math.sin(angle) + this.position.z * Math.round(Math.cos(angle))
             this.position.x = -x
@@ -133,34 +150,22 @@ class Cube {
         this.cube.position.x = this.position.x === -0 ? 0 : this.position.x
         this.cube.position.y = this.position.y === -0 ? 0 : this.position.y
         this.cube.position.z = this.position.z === -0 ? 0 : this.position.z
+    }
 
+    updateWorldDirection() {
         // direction of z-axis
         let worldDir = this.cube.getWorldDirection(new THREE.Vector3())
-        let worldPos = this.cube.getWorldPosition(new THREE.Vector3())
-        this.worldDirection = {x: worldDir.x , y: worldDir.y, z: worldDir.z}
-
-        // if(this.n === 14) {
-        //     console.log(this.n, this.worldDirection)
-        // }
+        // let worldPos = this.cube.getWorldPosition(new THREE.Vector3())
+        this.worldDirection = {x: worldDir.x, y: worldDir.y, z: worldDir.z}
     }
+
     getWDirection() {
         return [this.num, this.worldDirection]
     }
-    getMaterials() {
-        console.log(this.cube.material)
-    }
-    getOrientation() {
-        const worldQuaternion = this.cube.getWorldQuaternion(new THREE.Quaternion())
-        const eulerQuaternion = new THREE.Euler()
-        const test = eulerQuaternion.setFromQuaternion(worldQuaternion)
-        let eulerX = Math.round(test.x * 10000) / 10000
-        let eulerY = Math.round(test.y * 10000) / 10000
-        let eulerZ = Math.round(test.z * 10000) / 10000
-        console.log("x:", Math.round(eulerX * (180/Math.PI)), "y:", Math.round(eulerY * (180/Math.PI)), "z:", Math.round(eulerZ * (180/Math.PI)))
-    }
+
     update(movement, axis) {
         let reverse = 0
-        if(movement.indexOf("'") > -1) {
+        if (movement.indexOf("'") > -1) {
             reverse = 1
             movement = movement.replace("'", "")
         }
@@ -168,50 +173,53 @@ class Cube {
 
         this.rotateOnAxis(axis, angle)
         this.translateCube(angle, axis)
+        this.updateWorldDirection()
     }
 
     reset() {
-        if(this.num === 6) {
+        if (this.num === 6) {
             console.log(this.cube.position)
         }
         this.position = this.originalPosition
         this.rotation = {x: 0, y: 0, z: 0}
         this.cube.rotation.set(0, 0, 0)
         this.cube.position.set(this.originalPosition.x, this.originalPosition.y, this.originalPosition.z)
-        if(this.num === 6) {
+        if (this.num === 6) {
             console.log(this.cube.position)
         }
     }
+
     getLayer(cubePosition, maxPosition) {
         const layers = [["L", "R"], ["D", "U"], ["B", "F"]]
         let layerIndex = cubePosition.findIndex((el) => Math.abs(el) === maxPosition)
         let layer = Math.sign(cubePosition[layerIndex]) < 0 ? 0 : 1
         return layers[layerIndex][layer]
     }
+
     setPosition(position, name, maxPosition) {
         this.position = position
         this.originalPosition = {x: position.x, y: position.y, z: position.z}
         const calculatedTypeArray = [position.x, position.y, position.z]
-        const occurrence = calculatedTypeArray.filter(x => Math.abs(x)===maxPosition).length
-        if(occurrence === 3) {
+        const occurrence = calculatedTypeArray.filter(x => Math.abs(x) === maxPosition).length
+        if (occurrence === 3) {
             this.type = "corner"
-        } else if(occurrence === 2) {
+        } else if (occurrence === 2) {
             this.type = "edge"
         } else {
             let indexArray = calculatedTypeArray.findIndex((el) => Math.abs(el) === maxPosition)
-            let colorCenterIndex = indexArray*2
-            if(Math.sign(calculatedTypeArray[indexArray]) === -1) colorCenterIndex = (indexArray*2)+1
+            let colorCenterIndex = indexArray * 2
+            if (Math.sign(calculatedTypeArray[indexArray]) === -1) colorCenterIndex = (indexArray * 2) + 1
             this.originalColor = colorCenterIndex
             // this.originalColor = colors[colorCenterIndex]
             this.originalLayer = this.getLayer(calculatedTypeArray, maxPosition)
-            if(calculatedTypeArray.filter(x => x===0).length === 2) {
+            if (calculatedTypeArray.filter(x => x === 0).length === 2) {
                 this.type = "center"
                 this.subtype = "center-stoic"
             } else {
-                if(calculatedTypeArray.filter(x => x===0).length === 1) {
+                if (calculatedTypeArray.filter(x => x === 0).length === 1) {
                     this.type = "center"
                     this.subtype = "center-edge"
-                } else if(calculatedTypeArray.filter(x => x===0).length === 3) {
+                } else if (calculatedTypeArray.filter(x => x === 0).length === 3) {
                     this.type = "center"
                     this.subtype = "center-center"
                 } else {
@@ -222,18 +230,22 @@ class Cube {
         }
         this.num = name
     }
+
     setSize(size) {
         this.size = size
     }
-    setVisible(visible=true) {
+
+    setVisible(visible = true) {
         this.visible = visible
     }
+
     setLookAt(obj) {
         this.cube.lookAt(obj.position.x, obj.position.y, obj.position.z)
     }
+
     show() {
         const geometry = new THREE.BoxGeometry(this.size, this.size, this.size)
-        const axesHelper = new THREE.AxesHelper( 5 );
+        const axesHelper = new THREE.AxesHelper(5);
         this.cube = new THREE.Mesh(geometry, this.face())
         // if(this.n === 4 || this.n === 14 || this.n === 12 || this.n === 16 || this.n === 10 || this.n === 22) {
         //     this.cube.add(axesHelper)

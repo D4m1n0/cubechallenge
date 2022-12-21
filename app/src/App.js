@@ -46,7 +46,7 @@ function App() {
                     if(Math.max(Math.abs(x), Math.abs(y)) === maxPosition || Math.max(Math.abs(y), Math.abs(z)) === maxPosition) {
                         cube[index].setPosition({x: x, y: y, z: z}, index, maxPosition, delta)
                         cube[index].setSize(delta)
-                        // cube[index].addText = true
+                        cube[index].addText = true
                         // cube[index].setVisible(false)
                     } else {
                         cube[index] = null
@@ -134,7 +134,8 @@ function App() {
                     <RubikCube
                         cubes={cubes}
                         addTurn={(val) => setCount(val)}
-                        scramble={cubeLength === 3?"U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R'":"U F' U F' R F U' F' R'"}
+                        // scramble={cubeLength === 3?"U' B L F' R D R2 B' R2 B2 D F2 D B2 R2 D2 B2 D' R2 F2 R'":"U F' U F' R F U' F' R'"}
+                        scramble={"L'"}
                         maxPosition={maxPosition}
                         delta={delta}
                         cubeLength={cubeLength}
